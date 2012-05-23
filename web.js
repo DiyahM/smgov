@@ -11,13 +11,14 @@ app.configure(function(){
   app.set('view options',{layout:false});
 });
 
+
 var oa = new OAuth(
 	"https://api.twitter.com/oauth/request_token",
 	"https://api.twitter.com/oauth/access_token",
-	"06468VOd9bc8UaBCgomLVg",
-	"LouTevDJ6FxzTWrOCh7dRIplN1ft6jgHazdeHGxuVM",
+	"SkeCtmWaBi2ShT4SvffE1g",
+	"oWoV0tMtVrEAOXw7hKJm7Pxv491NXDJK3t0CGXyFw",
 	"1.0",
-	"http://local.host:3000/auth/twitter/callback",
+	"http://snapdemo.herokuapp.com/auth/twitter/callback",
 	"HMAC-SHA1"
 	);
 
