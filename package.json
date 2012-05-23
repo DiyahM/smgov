@@ -2,8 +2,8 @@
   "name":"node-example",
   "version": "0.0.1",
   "dependencies":{
-    "express":"latest"
-    "oauth":"latest"
+    "express":"latest",
+    "oauth":"latest",
     "ejs":"latest"
    }
 }
