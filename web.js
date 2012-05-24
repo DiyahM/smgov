@@ -1,5 +1,6 @@
 var express = require('express'),
-    OAuth = require('oauth').OAuth;
+    OAuth = require('oauth').OAuth,
+    twitter = require('ntwitter');
 
 var app = express.createServer(express.logger());
 
@@ -11,14 +12,27 @@ app.configure(function(){
   app.set('view options',{layout:false});
 });
 
+//app twitter settings
+
+var TWITTER_KEY = 'SkeCtmWaBi2ShT4SvffE1g',
+    TWITTER_SECRET = 'oWoV0tMtVrEAOXw7hKJm7Pxv491NXDJK3t0CGXyFw'
+    CALLBACK = 'http://snapdemo.herokuapp.com/auth/twitter/callback';
+
+var access_token, my_access_token_secret, twit;
+
+//localhost settings
+/*
+var TWITTER_KEY = '33mGf9Wg71gWZm1eNT61w',
+    TWITTER_SECRET = '0mZt0ga9WkGkNLB2sTuVF1a4Cl2pg1GrILglOTaqAqw'
+    CALLBACK = 'http://local.host:3000/auth/twitter/callback';*/
 
 var oa = new OAuth(
 	"https://api.twitter.com/oauth/request_token",
 	"https://api.twitter.com/oauth/access_token",
-	"SkeCtmWaBi2ShT4SvffE1g",
-	"oWoV0tMtVrEAOXw7hKJm7Pxv491NXDJK3t0CGXyFw",
+	TWITTER_KEY,
+	TWITTER_SECRET,
 	"1.0",
-	"http://snapdemo.herokuapp.com/auth/twitter/callback",
+	CALLBACK,
 	"HMAC-SHA1"
 	);
 
@@ -51,16 +65,40 @@ app.get('/auth/twitter/callback', function(req, res, next){
 					res.send("something is broken");
 				} else {
 					req.session.oauth.access_token = oauth_access_token;
+					access_token = oauth_access_token;
 					req.session.oauth.access_token_secret = oauth_access_token_secret;
+					my_access_token_secret = oauth_access_token_secret;
 					console.log(results);
+					twit = new twitter({
+						consumer_key: TWITTER_KEY,
+						consumer_secret : TWITTER_SECRET,
+						access_token_key : access_token,
+						access_token_secret: my_access_token_secret
+					});
 					res.render('demo_create_map')
 					//res.send("worked");
 				}
 			});
 	} else
-	  next(new Error("you're not suppose to be here" + req.session.oauth));
+	  next(new Error("you're not suppose to be here"));
 });
 
+app.get('/view_results', function(req, res){
+	
+	twit.stream('statuses/filter', {'track': req.param('track')},{'locations': req.param('locations')} function(stream){
+		var body = "";
+		stream.on('data',function(data){
+		  body += data;
+		  //console.log(data);	
+		});
+		
+		stream.on('end', function (response){
+			//handle a disconnection
+		});
+	} );
+	res.send('Check logs');
+	
+});
 
 app.get('/', function(request, response){
 	response.send('Loading...');

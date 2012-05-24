@@ -4,6 +4,7 @@
   "dependencies":{
     "express":"latest",
     "oauth":"latest",
-    "ejs":"latest"
+    "ejs":"latest",
+    "ntwitter":"latest"
    }
 }
