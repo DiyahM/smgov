@@ -23,8 +23,8 @@ var TWITTER_KEY = 'SkeCtmWaBi2ShT4SvffE1g',
 var access_token, my_access_token_secret, twit;
 
 //localhost settings
-
-/*var TWITTER_KEY = '33mGf9Wg71gWZm1eNT61w',
+/*
+var TWITTER_KEY = '33mGf9Wg71gWZm1eNT61w',
     TWITTER_SECRET = '0mZt0ga9WkGkNLB2sTuVF1a4Cl2pg1GrILglOTaqAqw'
     CALLBACK = 'http://local.host:3000/auth/twitter/callback';*/
 
@@ -77,7 +77,7 @@ app.get('/auth/twitter/callback', function(req, res, next){
 						access_token_key : access_token,
 						access_token_secret: my_access_token_secret
 					});
-					res.render('demo_create_map')
+					res.redirect('/demo_create_map');
 					//res.send("worked");
 				}
 			});
