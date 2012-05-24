@@ -1,8 +1,11 @@
 var express = require('express'),
     OAuth = require('oauth').OAuth,
-    twitter = require('ntwitter');
+    twitter = require('ntwitter'),
+    io = require('socket.io');
 
 var app = express.createServer(express.logger());
+
+io = io.listen(app);
 
 app.configure(function(){
   app.use(express.cookieParser());
@@ -13,18 +16,17 @@ app.configure(function(){
 });
 
 //app twitter settings
-
-var TWITTER_KEY = 'SkeCtmWaBi2ShT4SvffE1g',
+/*var TWITTER_KEY = 'SkeCtmWaBi2ShT4SvffE1g',
     TWITTER_SECRET = 'oWoV0tMtVrEAOXw7hKJm7Pxv491NXDJK3t0CGXyFw'
-    CALLBACK = 'http://snapdemo.herokuapp.com/auth/twitter/callback';
+    CALLBACK = 'http://snapdemo.herokuapp.com/auth/twitter/callback';*/
 
 var access_token, my_access_token_secret, twit;
 
 //localhost settings
-/*
+
 var TWITTER_KEY = '33mGf9Wg71gWZm1eNT61w',
     TWITTER_SECRET = '0mZt0ga9WkGkNLB2sTuVF1a4Cl2pg1GrILglOTaqAqw'
-    CALLBACK = 'http://local.host:3000/auth/twitter/callback';*/
+    CALLBACK = 'http://local.host:3000/auth/twitter/callback';
 
 var oa = new OAuth(
 	"https://api.twitter.com/oauth/request_token",
@@ -83,29 +85,47 @@ app.get('/auth/twitter/callback', function(req, res, next){
 	  next(new Error("you're not suppose to be here"));
 });
 
-app.get('/view_results', function(req, res){
-	
-	twit.stream('statuses/filter', {'track': req.param('track')},{'locations': req.param('locations')} function(stream){
-		var body = "";
-		stream.on('data',function(data){
-		  body += data;
-		  //console.log(data);	
-		});
-		
-		stream.on('end', function (response){
-			//handle a disconnection
-		});
-	} );
-	res.send('Check logs');
-	
+app.get('/demo_create_map', function(req,res){
+	res.render('demo_create_map')
 });
 
+
 app.get('/', function(request, response){
-	response.send('Loading...');
+	response.render('/static/index.html');
 });
 
 
 var port = process.env.PORT || 3000;
 app.listen(port, function() {
 	console.log("Listening on " + port);
-})
+});
+
+io.sockets.on('connection', function (socket) {
+	
+	socket.on('setupStream',function(track,location){	
+		//call streaming twitter
+		console.log('setupStream');
+		twit.stream('statuses/filter', {'track': track, 'locations': location}, function(stream){
+			console.log('in Stream');
+			//called when tweet received
+			stream.on('data',function(tweet){
+			   //socket.emit('tweet',JSON.stringify(tweet));
+			  console.log(tweet);	
+			});
+            
+            //called when disconnected
+			stream.on('end', function (response){
+				//handle a disconnection
+			});
+			
+			stream.on('error',function(response){
+			  console.log('error from twit stream '+ response);	
+			});
+		});
+		
+	});
+});
+
+
+
+

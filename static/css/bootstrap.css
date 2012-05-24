@@ -23,7 +23,7 @@ section {
 .txt-large {
 	font-size:1.5em;
 }
-#map_canvas {width:100%; min-height:320px;}
+#map_canvas {width:95%; min-height:420px;}
 audio,
 canvas,
 video {

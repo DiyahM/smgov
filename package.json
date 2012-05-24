@@ -8,6 +8,7 @@
     "express":"latest",
     "oauth":"latest",
     "ejs":"latest",
-    "ntwitter":"latest"
+    "ntwitter":"latest",
+    "socket.io":"latest"
    }
 }
