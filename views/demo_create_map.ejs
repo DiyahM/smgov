@@ -75,7 +75,8 @@
 	            <div id="map_canvas">Loading map...</div>
 	          </div>
 	         <div class="row">
-	           sample tweet that will go to 140 chars in 0 to 140. sample text, please help me. my throat is sore. still have 29 chars left at this now 4 1
+	           <div id="tweets"><ul></ul></div>
+	           <!--sample tweet that will go to 140 chars in 0 to 140. sample text, please help me. my throat is sore. still have 29 chars left at this now 4 1-->
 	         </div>
           </div>
         </div>
@@ -99,7 +100,7 @@
 							</span>
 			              <input type="text" class="input-large" id="map_coordinates" >
 			              </div>
-			              <p class="help-block">Use map to left to center map. Or enter address, city, state in above.</p>
+			              <p class="help-block">Use map controls to reposition. Or enter address, city, state in above.</p>
 			            </div>
 			          </div>
 				      <div class="control-group">
@@ -114,7 +115,7 @@
 					      <div class="tab-content">
 						    <div class="tab-pane active" id="tab1">
 						      
-							  <input type="text" class="input-small" id="keyword" placeholder="New keyword"> <button type='button' class='btn btn-mini' style='margin-top:-10px;'>Add</button>
+							  <input type="text" class="input-small" id="keyword_input" placeholder="New keyword"> <button type='button' class='btn btn-mini' onclick='addKeyword()' style='margin-top:-10px;'>Add</button>
 							  <div id="keywords"></div>
 							</div>
 							<div class="tab-pane" id="tab2">

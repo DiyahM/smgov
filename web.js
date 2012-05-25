@@ -6,6 +6,7 @@ var express = require('express'),
 var app = express.createServer(express.logger());
 
 io = io.listen(app);
+io.set('log level',1);
 
 app.configure(function(){
   app.use(express.cookieParser());
@@ -23,8 +24,8 @@ var TWITTER_KEY = 'SkeCtmWaBi2ShT4SvffE1g',
 var access_token, my_access_token_secret, twit;
 
 //localhost settings
-/*
-var TWITTER_KEY = '33mGf9Wg71gWZm1eNT61w',
+
+/*var TWITTER_KEY = '33mGf9Wg71gWZm1eNT61w',
     TWITTER_SECRET = '0mZt0ga9WkGkNLB2sTuVF1a4Cl2pg1GrILglOTaqAqw'
     CALLBACK = 'http://local.host:3000/auth/twitter/callback';*/
 
@@ -102,15 +103,15 @@ app.listen(port, function() {
 
 io.sockets.on('connection', function (socket) {
 	
-	socket.on('setupStream',function(track,location){	
+	socket.on('track',function(track,location){	
 		//call streaming twitter
-		console.log('setupStream');
+		//console.log('setupStream '+track+' '+location);
 		twit.stream('statuses/filter', {'track': track, 'locations': location}, function(stream){
-			console.log('in Stream');
+			//console.log('in Stream');
 			//called when tweet received
 			stream.on('data',function(tweet){
-			   //socket.emit('tweet',JSON.stringify(tweet));
-			  console.log(tweet);	
+			   socket.emit('tweet',escape(JSON.stringify(tweet)));
+			  //console.log(tweet);	
 			});
             
             //called when disconnected
