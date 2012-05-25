@@ -2,6 +2,9 @@ var map;
 var geocoder = new google.maps.Geocoder();
 var tracks = [];
 var stream_location;
+var tweet_count = 0;
+var markers = [];
+var infowindows = [];
 
 //html5 get user's location coordinates
 navigator.geolocation.getCurrentPosition(function(data) {
@@ -10,7 +13,7 @@ navigator.geolocation.getCurrentPosition(function(data) {
 	
 		var map_center = new google.maps.LatLng(lat, lng); 
 		map = new google.maps.Map(document.getElementById("map_canvas"), {
-		  zoom: 13,
+		  zoom: 10,
 		  center: map_center,
 		  mapTypeId: google.maps.MapTypeId.ROADMAP
 		});
@@ -82,13 +85,78 @@ function updatePositionInputField(){
 var socket= io.connect();
 
 socket.on('tweet',function(json){
+	
 	var tweet = JSON.parse(unescape(json));
-	var replacePattern = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
-	var replacedText = (tweet.text).replace(replacePattern, '<a href="$1" target="_blank">$1</a>');
-	$('#tweets ul').prepend('<li>'+tweet.user.screen_name+ ': '+ replacedText+'</li>').css({opacity:0}).slideDown("slow").animate({opacity:1},"slow");
-	/*if (tweet.geo)
-	  console.log('geo: '+ JSON.stringify(tweet.geo));*/
+	
+	if ((!tweet.retweeted))
+	{
+		if (tweetContainsKeyword(tweet))
+		{
+			if (!withinGeoBounds(tweet));
+			{	
+				var replacePattern = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+				var replacedText = (tweet.text).replace(replacePattern, '<a href="$1" target="_blank">$1</a>');
+				$('#tweets ul').prepend('<li>'+tweet.user.screen_name+ ': '+ replacedText+'</li>').css({opacity:0}).slideDown("slow").animate({opacity:1},"slow");
+				tweet_count++;
+				if (tweet_count > 20)
+				{
+					$('#tweets ul li').last().remove();
+					tweet_count--;
+				}
+			}		
+		}
+	}
 });
+
+function withinGeoBounds(tweet)
+{
+	if (tweet.geo)
+	{
+		var latlng = new google.maps.LatLng(tweet.geo.coordinates[0], tweet.geo.coordinates[1]);
+		if (map.getBounds().contains(latlng))
+		{
+		    infowindows[infowindows.length] = new google.maps.InfoWindow({
+				content: tweet.user.screen_name + ':' + tweet.text,
+				maxWidth: '200px'
+			});
+			
+			markers[markers.length] = new google.maps.Marker({
+				map: map,
+				position: latlng,
+				icon: tweet.user.profile_image_url,
+				clickable: true,
+				title: tweet.user.screen_name
+			});
+			
+			google.maps.event.addListener(markers[markers.length-1],'click',function(){
+				infowindows[$.inArray(this,markers)].open(map,this);
+			});
+			
+			google.maps.event.addListener(markers[markers.length-1],'mouseup',function(e){
+				e.preventDefault();
+			});
+			
+			google.maps.event.addListener(markers[markers.length-1],'mousedown',function(e){
+				e.preventDefault();
+			});
+			
+			return true;
+	    }
+	} 
+	return false;
+}
+
+function tweetContainsKeyword(tweet)
+{
+	for (var i= 0; i < tracks.length; i++)
+	{
+		if (tweet.text.indexOf(tracks[i]))
+		{
+		  return true;
+		}
+	}
+	return false;
+}
 
 function addKeyword(){
 	//console.log('keyword add');
@@ -110,6 +178,8 @@ function updateStream(){
 	}
 	
 }
+
+
 
 
 
