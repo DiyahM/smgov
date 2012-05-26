@@ -24,9 +24,9 @@ navigator.geolocation.getCurrentPosition(function(data) {
 
 function next(){
 
-  google.maps.event.addListener(map, 'bounds_changed', function(){
+  google.maps.event.addListener(map, 'idle', function(){
 	updatePositionInputField();
-	console.log('bounds event');
+	//console.log('bounds event');
   });
 
 }
