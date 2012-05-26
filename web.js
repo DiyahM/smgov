@@ -103,26 +103,47 @@ app.listen(port, function() {
 
 io.sockets.on('connection', function (socket) {
 	
-	socket.on('track',function(track){	
+	socket.on('track',function(track,location){	
 		//call streaming twitter
 		//console.log('setupStream '+track);
-		twit.stream('statuses/filter', {'track': track}, function(stream){
-			//console.log('in Stream');
-			//called when tweet received
-			stream.on('data',function(tweet){
-			   socket.emit('tweet',escape(JSON.stringify(tweet)));
-			  //console.log(tweet);	
-			});
+		if (track.length != 0)
+		{
+			twit.stream('statuses/filter', {'track': track,'locations':location}, function(stream){
+				//console.log('in Stream');
+				//called when tweet received
+				stream.on('data',function(tweet){
+				   socket.emit('tweet',escape(JSON.stringify(tweet)));
+				  //console.log(tweet);	
+				});
             
-            //called when disconnected
-			stream.on('end', function (response){
-				//handle a disconnection
-			});
+	            //called when disconnected
+				stream.on('end', function (response){
+					//handle a disconnection
+				});
 			
-			stream.on('error',function(response){
-			  console.log('error from twit stream '+ response);	
+				stream.on('error',function(response){
+				  console.log('error from twit stream '+ response);	
+				});
 			});
-		});
+	   } else {
+	 	    twit.stream('statuses/filter', {'locations':location}, function(stream){
+				//console.log('in Stream');
+				//called when tweet received
+				stream.on('data',function(tweet){
+				   socket.emit('tweet',escape(JSON.stringify(tweet)));
+				  //console.log(tweet);	
+				});
+            
+	            //called when disconnected
+				stream.on('end', function (response){
+					//handle a disconnection
+				});
+			
+				stream.on('error',function(response){
+				  console.log('error from twit stream '+ response);	
+				});
+			});
+	   }
 		
 	});
 });

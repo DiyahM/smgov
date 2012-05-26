@@ -1,7 +1,7 @@
 var map;
 var geocoder = new google.maps.Geocoder();
 var tracks = [];
-//var stream_location;
+var stream_location;
 var tweet_count = 0;
 var markers = [];
 var infowindows = [];
@@ -26,6 +26,7 @@ function next(){
 
   google.maps.event.addListener(map, 'bounds_changed', function(){
 	updatePositionInputField();
+	console.log('bounds event');
   });
 
 }
@@ -44,6 +45,7 @@ $('#map_coordinates').focus(function(){
 
 $('#map_coordinates').keydown(function(e){
 	if(e.keyCode == 13){
+		e.preventDefault();
 		updateMap();
 	}
 });
@@ -78,8 +80,9 @@ function setMapOptions(){
 function updatePositionInputField(){
 	
   $("#map_coordinates").val(map.getBounds().toString());
-  //stream_location = map.getBounds().getSouthWest().lng() + ',' + map.getBounds().getSouthWest().lat() + ',' +
-	     //map.getBounds().getNorthEast().lng() + ',' + map.getBounds().getNorthEast().lat();
+  stream_location = map.getBounds().getSouthWest().lng() + ',' + map.getBounds().getSouthWest().lat() + ',' +
+	     map.getBounds().getNorthEast().lng() + ',' + map.getBounds().getNorthEast().lat();
+	updateStream();
 }
 
 var socket= io.connect();
@@ -112,14 +115,14 @@ function withinGeoBounds(tweet)
 	var latlng;
 	if (!tweet.geo)
 	{
-		geocoder.geocode({'address':tweet.user.location}, function(results,status){
+		/*geocoder.geocode({'address':tweet.user.location}, function(results,status){
 			if (status == google.maps.GeocoderStatus.OK)
 			{
 				latlng = results[0].geometry.location;
 			} else{
 				console.log('no good user from '+tweet.user.location +' '+ status);
 			}
-		});
+		});*/
     } else {
 	    latlng = new google.maps.LatLng(tweet.geo.coordinates[0], tweet.geo.coordinates[1]);
     }
@@ -177,10 +180,9 @@ function addKeyword(){
 }
 
 function updateStream(){
-	if (tracks.length != 0)
-	{
-	  socket.emit('track',tracks.toString());
-	}
+
+	  socket.emit('track',tracks.toString(),stream_location);
+
 	
 }
 
