@@ -103,10 +103,10 @@ app.listen(port, function() {
 
 io.sockets.on('connection', function (socket) {
 	
-	socket.on('track',function(track,location){	
+	socket.on('track',function(track){	
 		//call streaming twitter
-		//console.log('setupStream '+track+' '+location);
-		twit.stream('statuses/filter', {'track': track, 'locations': location}, function(stream){
+		//console.log('setupStream '+track);
+		twit.stream('statuses/filter', {'track': track}, function(stream){
 			//console.log('in Stream');
 			//called when tweet received
 			stream.on('data',function(tweet){

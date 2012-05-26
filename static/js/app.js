@@ -1,7 +1,7 @@
 var map;
 var geocoder = new google.maps.Geocoder();
 var tracks = [];
-var stream_location;
+//var stream_location;
 var tweet_count = 0;
 var markers = [];
 var infowindows = [];
@@ -78,8 +78,8 @@ function setMapOptions(){
 function updatePositionInputField(){
 	
   $("#map_coordinates").val(map.getBounds().toString());
-  stream_location = map.getBounds().getSouthWest().lng() + ',' + map.getBounds().getSouthWest().lat() + ',' +
-	     map.getBounds().getNorthEast().lng() + ',' + map.getBounds().getNorthEast().lat();
+  //stream_location = map.getBounds().getSouthWest().lng() + ',' + map.getBounds().getSouthWest().lat() + ',' +
+	     //map.getBounds().getNorthEast().lng() + ',' + map.getBounds().getNorthEast().lat();
 }
 
 var socket= io.connect();
@@ -90,8 +90,6 @@ socket.on('tweet',function(json){
 	
 	if ((!tweet.retweeted))
 	{
-		if (tweetContainsKeyword(tweet))
-		{
 			if (!withinGeoBounds(tweet));
 			{	
 				var replacePattern = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
@@ -104,16 +102,31 @@ socket.on('tweet',function(json){
 					tweet_count--;
 				}
 			}		
-		}
+		
 	}
 });
 
 function withinGeoBounds(tweet)
 {
-	if (tweet.geo)
+	
+	var latlng;
+	if (!tweet.geo)
 	{
-		var latlng = new google.maps.LatLng(tweet.geo.coordinates[0], tweet.geo.coordinates[1]);
-		if (map.getBounds().contains(latlng))
+		geocoder.geocode({'address':tweet.user.location}, function(results,status){
+			if (status == google.maps.GeocoderStatus.OK)
+			{
+				latlng = results[0].geometry.location;
+			} else{
+				console.log('no good user from '+tweet.user.location +' '+ status);
+			}
+		});
+    } else {
+	    latlng = new google.maps.LatLng(tweet.geo.coordinates[0], tweet.geo.coordinates[1]);
+    }
+
+    if (latlng)
+    {
+	    if (map.getBounds().contains(latlng))
 		{
 		    infowindows[infowindows.length] = new google.maps.InfoWindow({
 				content: tweet.user.screen_name + ':' + tweet.text,
@@ -132,17 +145,9 @@ function withinGeoBounds(tweet)
 				infowindows[$.inArray(this,markers)].open(map,this);
 			});
 			
-			google.maps.event.addListener(markers[markers.length-1],'mouseup',function(e){
-				e.preventDefault();
-			});
-			
-			google.maps.event.addListener(markers[markers.length-1],'mousedown',function(e){
-				e.preventDefault();
-			});
-			
 			return true;
 	    }
-	} 
+    }
 	return false;
 }
 
@@ -174,7 +179,7 @@ function addKeyword(){
 function updateStream(){
 	if (tracks.length != 0)
 	{
-	  socket.emit('track',tracks.toString(),stream_location);
+	  socket.emit('track',tracks.toString());
 	}
 	
 }
