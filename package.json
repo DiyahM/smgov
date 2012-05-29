@@ -9,6 +9,7 @@
     "oauth":"latest",
     "ejs":"latest",
     "ntwitter":"latest",
-    "socket.io":"latest"
+    "socket.io":"latest",
+    "redis":"latest"
    }
 }

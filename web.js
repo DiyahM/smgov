@@ -1,9 +1,18 @@
 var express = require('express'),
     OAuth = require('oauth').OAuth,
     twitter = require('ntwitter'),
-    io = require('socket.io');
+    io = require('socket.io'),
+    redis = require('redis');
 
 var app = express.createServer(express.logger());
+var redis_client = redis.createClient('9279','scat.redistogo.com');
+redis_client.auth('bb20238066f9fca9c19efdbf18cb8bf9',function(err,reply){
+	console.log(reply.toString());
+});
+
+//array of keywords
+var keywords = [];
+
 
 io = io.listen(app);
 io.set('log level',1);
@@ -24,7 +33,6 @@ var TWITTER_KEY = 'SkeCtmWaBi2ShT4SvffE1g',
 var access_token, my_access_token_secret, twit;
 
 //localhost settings
-
 /*var TWITTER_KEY = '33mGf9Wg71gWZm1eNT61w',
     TWITTER_SECRET = '0mZt0ga9WkGkNLB2sTuVF1a4Cl2pg1GrILglOTaqAqw'
     CALLBACK = 'http://local.host:3000/auth/twitter/callback';*/
@@ -110,19 +118,22 @@ io.sockets.on('connection', function (socket) {
 		{
 			twit.stream('statuses/filter', {'track': track,'locations':location}, function(stream){
 				//console.log('in Stream');
+				keywords = track.split(',');
 				//called when tweet received
 				stream.on('data',function(tweet){
-				   socket.emit('tweet',escape(JSON.stringify(tweet)));
-				  //console.log(tweet);	
+				   processTweet(tweet,socket);
+				   //socket.emit('tweet',escape(JSON.stringify(tweet)));
+				  //console.log('recv tweet');	
 				});
             
 	            //called when disconnected
 				stream.on('end', function (response){
 					//handle a disconnection
+					console.log('stream recv end');
 				});
 			
 				stream.on('error',function(response){
-				  console.log('error from twit stream '+ response);	
+				  console.log('error from track twit stream '+ JSON.stringify(response));	
 				});
 			});
 	   } else {
@@ -130,7 +141,7 @@ io.sockets.on('connection', function (socket) {
 				//console.log('in Stream');
 				//called when tweet received
 				stream.on('data',function(tweet){
-				   socket.emit('tweet',escape(JSON.stringify(tweet)));
+				   //socket.emit('tweet',escape(JSON.stringify(tweet)));
 				  //console.log(tweet);	
 				});
             
@@ -140,13 +151,64 @@ io.sockets.on('connection', function (socket) {
 				});
 			
 				stream.on('error',function(response){
-				  console.log('error from twit stream '+ response);	
+				  console.log('error from location only twit stream '+ response);	
 				});
 			});
 	   }
 		
 	});
+	
+	socket.on('disconnect',function(err,reply){
+		console.log('user disconnect');
+		redis_client.flushdb(function(err,reply){
+			//console.log(reply);
+		});
+	});
+	
 });
+
+
+
+//processTweet takes a tweet from twitter stream adds to redis store and sends summary message to web browser through socket
+function processTweet(tweet_json, socket){
+	
+	var tweet = JSON.parse(JSON.stringify(tweet_json));
+	if (!tweet.retweeted) 
+	{
+	  	var multi = redis_client.multi();
+		
+
+		for (i=0; i<keywords.length;i++)
+		{
+			if (tweet.text.indexOf(keywords[i]))
+			{
+				redis_client.setnx('tweet:'+tweet.id_str+':json',escape(JSON.stringify(tweet_json)));
+				var message = {"keyword":keywords[i],
+				               "count":null,
+				               "geo_count":null};
+				multi.sadd(keywords[i]+'.tweets',tweet.id_str);
+				multi.scard(keywords[i]+'.tweets', function(err, reply){
+					//console.log('recv from redis: '+ reply)
+					message.count = reply;
+				});
+				//console.log('inside processTweet found match');
+				if (tweet.geo)
+				{
+					multi.sadd(keywords[i]+'.geo', tweet.id_str);
+					multi.scard(keywords[i]+'.geo', function(err, reply){
+						//console.log('recv from geo redis: '+ reply)
+						message.geo_count = reply;
+					});
+				}
+				multi.exec(function (err, replies) {
+				      socket.emit('tweet',JSON.stringify(message));
+				    });
+				
+			}
+		}	
+	}
+	
+}
 
 
 

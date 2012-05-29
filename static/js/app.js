@@ -89,9 +89,18 @@ var socket= io.connect();
 
 socket.on('tweet',function(json){
 	
-	var tweet = JSON.parse(unescape(json));
+	var tweet = JSON.parse(json);
+	console.log('tweet received ' + json);
 	
-	if ((!tweet.retweeted))
+	if (tweet.count)
+	  $('#'+tweet.keyword+'_count').html(tweet.count);
+	
+	if (tweet.geo_count)
+	  $('#'+tweet.keyword+'_geocoded').html(tweet.geo_count);
+	
+	console.log('recv from socket '+ json)
+	
+	/*if ((!tweet.retweeted))
 	{
 			if (!withinGeoBounds(tweet));
 			{	
@@ -106,8 +115,9 @@ socket.on('tweet',function(json){
 				}
 			}		
 		
-	}
+	}*/
 });
+
 
 function withinGeoBounds(tweet)
 {
@@ -174,13 +184,25 @@ function addKeyword(){
 	  tracks.push(keyword);
 	  $('#keywords').prepend(keyword + '<br>');
 	  $('#keyword_input').val('');
+	  
+	  $('thead').after('<tr id='+keyword+'><td>'
+	  +keyword+'</td><td>Twitter</td><td id="'
+	  +keyword+'_count">0</td><td id="'
+	  +keyword+'_images">0</td><td id="'
+	  +keyword+'_videos">0</td><td id="'
+	  +keyword+'_geocoded">0</td><td id="'
+	  +keyword+'_sentiment">tbd</td><td id="'
+	  +keyword+'_action"><button class="btn btn-mini">Expand</button></td></tr>');
+	
 	  updateStream();
-	}	
+	}
+	
 	
 }
 
 function updateStream(){
 
+	if (tracks.length)  
 	  socket.emit('track',tracks.toString(),stream_location);
 
 	
