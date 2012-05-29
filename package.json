@@ -10,6 +10,7 @@
     "ejs":"latest",
     "ntwitter":"latest",
     "socket.io":"latest",
-    "redis":"latest"
+    "redis":"latest",
+    "jQuery":"latest"
    }
 }

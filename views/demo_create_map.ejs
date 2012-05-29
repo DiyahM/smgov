@@ -46,32 +46,34 @@
      </div>
    </div>
  </div>
+<!----END NAVBAR -->
+
+<!---BEGIN CONTAINER-->
 
     <div style="margin-top:40px;">
+      <!--MAIN CONTENT BEGIN-->
       <div class="row-fluid">
+        <!---BEGIN COLUMN 1 contains MAP, Overlay Checkboxes, and Results Table-->
         <div class="span9">
           
-          
+         <!--MAP BEGIN--> 
 		     <div class="row-fluid">
-	            <div id="map_canvas">Loading map...</div>
+	            <div id="map_canvas" class="fullscreen">Loading map...</div>
 	          </div>
+	     <!--MAP END--> 
+	     <!--Overlays BEGIN-->
 			<div class="row-fluid">
-	            <div class="control-group">
+			    
+	            <div class="control-group map_overlays">
 
 			        <div class="controls" style="padding-top:6px;">
-			          <label class="checkbox inline"><strong>Data Views:</strong> 
+			          <label class="checkbox inline"><strong>Overlays:</strong> 
 				      </label>
 				      <label class="checkbox inline">
-				        <input type="checkbox" id="camera_checkbox" value="">Traffic Cameras
-				      </label>
-				      <label class="checkbox inline">
-				        <input type="checkbox" id="twitter_sentiment_checkbox" value="">Sentiment
+				        <input type="checkbox" id="camera_checkbox" value="">Traffic Cameras (Baltimore, MD)
 				      </label>
 				      <label class="checkbox inline">
 				        <input type="checkbox" id="twitter_sentiment_checkbox" value="">Images
-				      </label>
-				    
-			          <label class="checkbox inline"><strong>Map Overlays:</strong> 
 				      </label>
 				      <label class="checkbox inline">
 				        <input type="checkbox" id="police_checkbox" value="">Police Stations
@@ -86,14 +88,17 @@
 				      <button type="button" class="btn btn-mini" style="margin-left:8px;"><i class="icon-map-marker"></i>Upload Map Overlays File</button> 
 				    </div>
 			      </div>
+			</div>
+			<!--Overlays END-->
+			<!--Results table Begin -->
 	         <div class="row-fluid">
-	           <!--DATA TABLE Begin -->
-	           <div id="data_table" style="max-height:235px;overflow:auto;margin-left:5px;">
+	           
+	           <div id="data_table" style="max-height:235px;overflow:auto;margin-left:5px;visibility:hidden;">
 	             <table class="table table-condensed table-bordered table-striped" id="tweets_table">
 	               <thead>
 	                 <tr>
-	                   <th>Keyword</th>
 	                   <th>Source</th>
+	                   <th>Keyword</th>
 	                   <th>Items</th>
 	                   <th>Images</th>
 	                   <th>Video</th>
@@ -104,38 +109,42 @@
 	               </thead>
 	             </table>
 	            </div>
-	           <!-- DATA TABLE END -->
-	           <!--TEMP for debug-->
+	          </div>
+	           <!-- Results table END -->
+	           <!--TEMP for debug BEGIN-->
 	           <div id="tweets"><ul></ul></div>
 	           <!--sample tweet that will go to 140 chars in 0 to 140. sample text, please help me. my throat is sore. still have 29 chars left at this now 4 1-->
+	          <!--TEMP for debug END-->
 	         </div>
-          </div>
-        </div>
+	     <!--COLUMN1 END-->
+        <!--COLUMN2 BEGIN for search, location, and spot report-->  
         <div class="span3 offset2">
-           	<!-- Forms
-			================================================== --> 
+          <!--Record button begin -->
+          <div class="row-fluid"><button class="btn" style="width:95%;margin:10px;">Record Data Stream</button></div>
+           <!--Record button end -->
+        <!--SEARCH BEGIN-->
            <div class="row-fluid">
-			<section id="forms">
+			
 			      <form class="well">
 			        
 			        <fieldset>
 			          
 			          <h5><i class="icon-search"></i> SEARCH</h5><br>
 			         
-			         <!--Social Media Search Begin--> 
+			         
 			         <div class="control-group">
 				        <div class="controls">
 				          	<input type="text" class="input-large" id="keyword_input" placeholder="New keyword"> <button type='button' class='btn' onclick='addKeyword()' style='margin-top:-10px;'><i class="icon-plus"></i></button>
 							  <div id="keywords"></div>
 						  <button type="button" class="btn btn-mini" style="">Upload Keyword File</button><br><br>
 					      <label class="checkbox inline">
-					        <input type="checkbox" id="twitter_checkbox" value="">Twitter
+					        <input type="checkbox" id="twitter_checkbox" value="" onclick="twitterToggle()">Twitter
 					      </label>
 					      <label class="checkbox inline">
-					        <input type="checkbox" id="facebook_checkbox" value="">Facebook
+					        <input type="checkbox" id="facebook_checkbox" value="" onclick="facebookToggle()">Facebook
 					      </label>
 				          <label class="checkbox inline">
-					        <input type="checkbox" id="rss_checkbox" value="">RSS
+					        <input type="checkbox" id="rss_checkbox" value="" onclick="rssToggle()">RSS
 					      </label>
 					      <label class="checkbox">
 					        <input type="checkbox" id="custom_checkbox" value="">{Custom User Defined}
@@ -143,16 +152,18 @@
 					      
 					    </div>
 				      </div>
-				      	<button type="button" class="btn btn-mini" style="">Record Data</button>
-					      <button type="button" class="btn btn-mini btn-primary" style="">Publish Map</button>
-				     </form>
-				     </fieldset>
-				      <!-- Social Media END -->
+				       <button type='button' class='btn'>Save Search</button> <button type='button' class='btn btn-primary' onclick="search()">Search</button> 
+				  </fieldset>   
+				  </form>
+				</div>
+				<!--SEARCH END-->
 				      <!--MAP LAT LON BEGIN-->
+				  <div class="row-fluid">
 				     <form class="well">
 
 				        <fieldset>
-				     <h5> <i class="icon-map-marker"></i>LOCATION</h5><br>
+				     <h5> <i class="icon-map-marker"></i>LOCATION</h5>
+				<h6>Use map controls to reposition. Or enter address, city, state.</h6>
 			          <div class="control-group">
 
 			            <div class="controls">
@@ -163,26 +174,31 @@
 							</span>
 			              <input type="text" class="input-large" id="map_coordinates" >
 			              </div>
-			              Use map controls to reposition. Or enter address, city, state.
+			              
+			             <label class="checkbox">
+					        <input type="checkbox" id="twitter_trends_checkbox" value="">Show Twitter Trends For Location
+					      </label>
 			            </div>
 			          </div>
 			          
-			         <!--LAT LON END-->
+			          
+			         
 				      
 			        </fieldset>
 			      </form>
-			</section>
+			
 			</div>
-			<!-- Report
+			<!--LAT LON END-->
+			<!-- Report BEGIN
 			================================================== --> 
            <div class="row-fluid">
-			<section id="report">
+			
 			      <form class="well form-horizontal">
 
 			        <fieldset>
 			        
-			         <i class="icon-envelope"></i> SPOT REPORT
-			          
+			         <h5><i class="icon-envelope"></i> SPOT REPORT</h5>
+			          <h6>Drag elements to this box to attach to report</h6>
 			          <div class="control-group" style="margin-top:15px;">
 			             <label class="control-label" for="send_to" style="width:auto;">TO: </label>
 			           	<div class="controls" style="margin-left:30px;">
@@ -194,26 +210,21 @@
 			              <input type="text" class="input-large" id="report_description" placeholder="Report Description">
 			            </div>
 			           </div>
-			            <span class="badge badge-info">0</span> ATTACHMENTS
+			            <span class="badge badge-info">0</span> ATTACHMENTS <button type='button' class='btn btn-primary pull-right' style="margin-top:-8px;margin-right:30px;">SEND</button>
 			          </div>
 				      
-                       <p>
-				        <button type='button' class='btn btn-mini'>Create in Report View</button> <button type='button' class='btn btn-mini btn-primary'>Save Report</button></p>
-				      Drag elements to this box to attach to report
 
 			        </fieldset>
 			      </form>
-			</section>
+			
 			</div>
+			<!--REPORT END-->
         </div>
+      <!--COLUMN 2 END-->
       </div>
+     <!--MAIN CONTENT END-->
       
 
-
-
-
-
-<br><br><br><br>
 
      <!-- Footer
       ================================================== -->
@@ -221,7 +232,7 @@
         <p class="pull-right">2012 SNAP Link -- For Demo Only</p>
       </footer>
 
-    </div><!-- /container -->
+    </div><!-- /container end-->
 
 
 

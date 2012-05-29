@@ -23,9 +23,12 @@ section {
 .txt-large {
 	font-size:1.5em;
 }
-#map_canvas {width:103%; min-height:350px;left:0;}
+#map_canvas {width:103%; left:0;}
+.fullscreen{min-height:600px;}
+.halfscreen{min-height:350px;}
 #map_canvas img{max-width:none;}
 #map_canvas label{width:auto; display:inline;}
+.map_overlays{background-color:lightblue;padding-bottom:7px;border-radius:6px;margin-top:6px;margin-left:15px;}
 audio,
 canvas,
 video {

@@ -2,7 +2,8 @@ var express = require('express'),
     OAuth = require('oauth').OAuth,
     twitter = require('ntwitter'),
     io = require('socket.io'),
-    redis = require('redis');
+    redis = require('redis'),
+    $ = require('jQuery');
 
 var app = express.createServer(express.logger());
 var redis_client = redis.createClient('9279','scat.redistogo.com');
@@ -79,7 +80,8 @@ app.get('/auth/twitter/callback', function(req, res, next){
 					access_token = oauth_access_token;
 					req.session.oauth.access_token_secret = oauth_access_token_secret;
 					my_access_token_secret = oauth_access_token_secret;
-					console.log(results);
+					//console.log(results);
+					//NEED TO REMOVE FROM HERE
 					twit = new twitter({
 						consumer_key: TWITTER_KEY,
 						consumer_secret : TWITTER_SECRET,
@@ -116,9 +118,11 @@ io.sockets.on('connection', function (socket) {
 		//console.log('setupStream '+track);
 		if (track.length != 0)
 		{
-			twit.stream('statuses/filter', {'track': track,'locations':location}, function(stream){
+			twit.stream('statuses/filter', {'track': unescape(track),'locations':location}, function(stream){
 				//console.log('in Stream');
-				keywords = track.split(',');
+				temp = unescape(track);
+				//console.log('temp is ' +temp);
+				keywords = temp.split(',');
 				//called when tweet received
 				stream.on('data',function(tweet){
 				   processTweet(tweet,socket);
@@ -158,8 +162,26 @@ io.sockets.on('connection', function (socket) {
 		
 	});
 	
+	socket.on('fbsearch',function(track){
+		temp = unescape(track);
+		keywords = temp.split(',');
+		
+		var len = keywords.length;
+		for (var i=0;i<len;i++){
+			
+			var temp = keywords[i];
+			$.getJSON('http://graph.facebook.com/search?q='+escape(keywords[i])+'&type=post&callback=?',function(data){
+			  //console.log(temp);
+			  processFacebook(data, temp, socket);
+			});
+			
+				
+		}
+	
+	});
+	
 	socket.on('disconnect',function(err,reply){
-		console.log('user disconnect');
+		//console.log('user disconnect');
 		redis_client.flushdb(function(err,reply){
 			//console.log(reply);
 		});
@@ -167,7 +189,50 @@ io.sockets.on('connection', function (socket) {
 	
 });
 
+function processFacebook(data, keyword, socket){
+	result = data.data;
+	var multi = redis_client.multi();
+	$.each(result,function(attr,value){
+		redis_client.setnx('facebook.post:'+this.id+':json', function(err, reply){
+		});
+		multi.sadd(keyword+'.facebook.posts','facebook.post:'+this.id+':json');
+		if (this.type === "photo")
+		  multi.sadd(keyword+'.facebook.photos','facebook.post:'+this.id+':json');
+		
+		if (this.type === "video")
+		  multi.sadd(keyword+'.facebook.video','facebook.post:'+this.id+':json');
+		
+	});
+	//console.log('keyword is '+keyword);
+	var message = {"keyword":keyword,
+	               "count":null,
+	               "photos":null,
+	               "videos":null};
 
+	multi.exec(function(err,replies){
+		
+		var next_multi = redis_client.multi();
+		//console.log('exec replies '+ replies);
+		next_multi.scard(keyword+'.facebook.posts',function(err,reply){
+			message.count = reply;
+		});
+
+		next_multi.scard(keyword+'.facebook.photos',function(err, reply){
+			message.photos = reply;
+		});
+
+		next_multi.scard(keyword+'.facebook.video',function(err, reply){
+			message.videos = reply;
+		});
+		
+		next_multi.exec(function(err,replies){
+		  	//console.log('exec2 replies '+ replies);
+		  socket.emit('fbresults',JSON.stringify(message));	
+		});
+		
+	});	
+	
+}
 
 //processTweet takes a tweet from twitter stream adds to redis store and sends summary message to web browser through socket
 function processTweet(tweet_json, socket){
@@ -177,8 +242,8 @@ function processTweet(tweet_json, socket){
 	{
 	  	var multi = redis_client.multi();
 		
-
-		for (i=0; i<keywords.length;i++)
+        var len = keywords.length;
+		for (var i=0; i<len;i++)
 		{
 			if (tweet.text.indexOf(keywords[i]))
 			{
@@ -186,7 +251,7 @@ function processTweet(tweet_json, socket){
 				var message = {"keyword":keywords[i],
 				               "count":null,
 				               "geo_count":null};
-				multi.sadd(keywords[i]+'.tweets',tweet.id_str);
+				multi.sadd(keywords[i]+'.tweets','tweet:'+tweet.id_str+':json');
 				multi.scard(keywords[i]+'.tweets', function(err, reply){
 					//console.log('recv from redis: '+ reply)
 					message.count = reply;
@@ -194,7 +259,7 @@ function processTweet(tweet_json, socket){
 				//console.log('inside processTweet found match');
 				if (tweet.geo)
 				{
-					multi.sadd(keywords[i]+'.geo', tweet.id_str);
+					multi.sadd(keywords[i]+'.geo', 'tweet:'+tweet.id_str+':json');
 					multi.scard(keywords[i]+'.geo', function(err, reply){
 						//console.log('recv from geo redis: '+ reply)
 						message.geo_count = reply;

@@ -85,20 +85,22 @@ function updatePositionInputField(){
 	updateStream();
 }
 
+//socket connect
 var socket= io.connect();
 
+//socket calls
 socket.on('tweet',function(json){
 	
 	var tweet = JSON.parse(json);
-	console.log('tweet received ' + json);
+	//console.log('tweet received ' + json);
 	
 	if (tweet.count)
-	  $('#'+tweet.keyword+'_count').html(tweet.count);
+	  $('#'+getDivName(tweet.keyword)+'_tcount').html(tweet.count);
 	
 	if (tweet.geo_count)
-	  $('#'+tweet.keyword+'_geocoded').html(tweet.geo_count);
+	  $('#'+getDivName(tweet.keyword)+'_tgeocoded').html(tweet.geo_count);
 	
-	console.log('recv from socket '+ json)
+	
 	
 	/*if ((!tweet.retweeted))
 	{
@@ -117,6 +119,29 @@ socket.on('tweet',function(json){
 		
 	}*/
 });
+
+socket.on('fbresults',function(json){
+	
+	var fbresults = JSON.parse(json);
+	//console.log('fb received ' + json);
+	
+	if (fbresults.count)
+	  $('#'+getDivName(fbresults.keyword)+'_fcount').html(fbresults.count);
+	
+	if (fbresults.photos)
+	  $('#'+getDivName(fbresults.keyword)+'_fimages').html(fbresults.photos);
+	
+	if (fbresults.videos)
+	  $('#'+getDivName(fbresults.keyword)+'_fvideos').html(fbresults.videos);
+	
+});
+
+function getDivName(keyword)
+{
+	temp = keyword.split(' ').join("");
+	return temp;
+}
+
 
 
 function withinGeoBounds(tweet)
@@ -166,7 +191,8 @@ function withinGeoBounds(tweet)
 
 function tweetContainsKeyword(tweet)
 {
-	for (var i= 0; i < tracks.length; i++)
+    var len = tracks.length;
+	for (var i= 0; i < len; i++)
 	{
 		if (tweet.text.indexOf(tracks[i]))
 		{
@@ -182,29 +208,124 @@ function addKeyword(){
 	if ((keyword != 'New keyword') && (keyword != ''))
 	{
 	  tracks.push(keyword);
-	  $('#keywords').prepend(keyword + '<br>');
+	  $('#keywords').append(keyword + ' ');
 	  $('#keyword_input').val('');
+	  twitterToggle();
+	  facebookToggle();
+	  rssToggle();
 	  
-	  $('thead').after('<tr id='+keyword+'><td>'
-	  +keyword+'</td><td>Twitter</td><td id="'
-	  +keyword+'_count">0</td><td id="'
-	  +keyword+'_images">tbd</td><td id="'
-	  +keyword+'_videos">tbd</td><td id="'
-	  +keyword+'_geocoded">0</td><td id="'
-	  +keyword+'_sentiment">tbd</td><td id="'
-	  +keyword+'_action"><button class="btn btn-mini">Expand</button></td></tr>');
+	}
+		
+}
+
+function twitterToggle(){
 	
-	  updateStream();
+	var len = tracks.length;
+	for (var i=0;i<len;i++){
+		if ($('#twitter_checkbox').attr('checked'))
+		{
+			$('thead').after('<tr id='+getDivName(tracks[i])+'_twitter><td>Twitter</td><td>'
+			  +tracks[i]+'</td><td id="'
+			  +getDivName(tracks[i])+'_tcount">0</td><td id="'
+			  +getDivName(tracks[i])+'_timages">tbd</td><td id="'
+			  +getDivName(tracks[i])+'_tvideos">tbd</td><td id="'
+			  +getDivName(tracks[i])+'_tgeocoded">0</td><td id="'
+			  +getDivName(tracks[i])+'_tsentiment">tbd</td><td id="'
+			  +getDivName(tracks[i])+'_taction"><button class="btn btn-mini">Expand</button></td></tr>');
+			
+
+		} else {
+          $('#'+getDivName(tracks[i])+'_twitter').remove();
+		}
+		
+	}	
+}
+
+function facebookToggle(){
+	var len = tracks.length;
+	for (var i=0;i<len;i++){
+		if ($('#facebook_checkbox').attr('checked'))
+		{
+			$('thead').after('<tr id='+getDivName(tracks[i])+'_facebook><td>Facebook</td><td>'
+			  +tracks[i]+'</td><td id="'
+			  +getDivName(tracks[i])+'_fcount">0</td><td id="'
+			  +getDivName(tracks[i])+'_fimages">tbd</td><td id="'
+			  +getDivName(tracks[i])+'_fvideos">tbd</td><td id="'
+			  +getDivName(tracks[i])+'_fgeocoded">tbd</td><td id="'
+			  +getDivName(tracks[i])+'_fsentiment">tbd</td><td id="'
+			  +getDivName(tracks[i])+'_faction"><button class="btn btn-mini">Expand</button></td></tr>');
+			  
+		} else {
+          $('#'+getDivName(tracks[i])+'_facebook').remove();
+		}
+		
 	}
 	
+}
+
+function rssToggle(){
+	var len = tracks.length;
+	for (var i=0;i<len;i++){
+		if ($('#rss_checkbox').attr('checked'))
+		{
+			$('thead').after('<tr id='+getDivName(tracks[i])+'_rss><td>RSS</td><td>'
+			  +tracks[i]+'</td><td id="'
+			  +getDivName(tracks[i])+'_rcount">0</td><td id="'
+			  +getDivName(tracks[i])+'_rimages">tbd</td><td id="'
+			  +getDivName(tracks[i])+'_rvideos">tbd</td><td id="'
+			  +getDivName(tracks[i])+'_rgeocoded">0</td><td id="'
+			  +getDivName(tracks[i])+'_rsentiment">tbd</td><td id="'
+			  +getDivName(tracks[i])+'_raction"><button class="btn btn-mini">Expand</button></td></tr>');
+		} else {
+          $('#'+getDivName(tracks[i])+'_rss').remove();
+		}
+		
+	}
+	
+}
+
+function search(){
+	
+	showResults();
+	
+	if ($('#twitter_checkbox').attr('checked'))
+	  updateStream();
+	
+	if ($('#facebook_checkbox').attr('checked'))
+	  searchFB();
+	
+	if ($('#rss_checkbox').attr('checked'))
+	  searchRSS();
+	
+	
+
+}
+
+function showResults(){
+	
+	$('#data_table').css('visibility','visible');
+	$('#map_canvas').addClass('halfscreen');
+	$('#map_canvas').removeClass('fullscreen');
 	
 }
 
 function updateStream(){
+	
+	if ((tracks.length) && ($('#twitter_checkbox').attr('checked'))) 
+	  socket.emit('track',escape(tracks.toString()),stream_location);
+	
+}
 
-	if (tracks.length)  
-	  socket.emit('track',tracks.toString(),stream_location);
+function searchFB(){
+	if (tracks.length)
+	{
+		socket.emit('fbsearch',escape(tracks.toString()));
+	}
+	  
+	
+}
 
+function searchRSS(){
 	
 }
 
