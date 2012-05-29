@@ -188,8 +188,8 @@ function addKeyword(){
 	  $('thead').after('<tr id='+keyword+'><td>'
 	  +keyword+'</td><td>Twitter</td><td id="'
 	  +keyword+'_count">0</td><td id="'
-	  +keyword+'_images">0</td><td id="'
-	  +keyword+'_videos">0</td><td id="'
+	  +keyword+'_images">tbd</td><td id="'
+	  +keyword+'_videos">tbd</td><td id="'
 	  +keyword+'_geocoded">0</td><td id="'
 	  +keyword+'_sentiment">tbd</td><td id="'
 	  +keyword+'_action"><button class="btn btn-mini">Expand</button></td></tr>');
