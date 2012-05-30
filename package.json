@@ -11,6 +11,7 @@
     "ntwitter":"latest",
     "socket.io":"latest",
     "redis":"latest",
-    "jQuery":"latest"
+    "jQuery":"latest",
+    "Sentimental":"latest"
    }
 }

@@ -3,7 +3,8 @@ var express = require('express'),
     twitter = require('ntwitter'),
     io = require('socket.io'),
     redis = require('redis'),
-    $ = require('jQuery');
+    $ = require('jQuery'),
+    analyze = require('sentimental').analyze;
 
 var app = express.createServer(express.logger());
 var redis_client = redis.createClient('9279','scat.redistogo.com');
@@ -170,15 +171,19 @@ io.sockets.on('connection', function (socket) {
 		for (var i=0;i<len;i++){
 			
 			var temp = keywords[i];
-			$.getJSON('http://graph.facebook.com/search?q='+escape(keywords[i])+'&type=post&callback=?',function(data){
-			  //console.log(temp);
-			  processFacebook(data, temp, socket);
-			});
+			$.getJSON('http://graph.facebook.com/search?q='+escape(keywords[i])+'&type=post&callback=?',{"keyword":temp},(function(temp){
+				return function(data){
+					processFacebook(data, temp, socket);
+				}
+			  
+			})(temp));
 			
 				
 		}
 	
 	});
+	
+
 	
 	socket.on('disconnect',function(err,reply){
 		//console.log('user disconnect');
@@ -193,21 +198,42 @@ function processFacebook(data, keyword, socket){
 	result = data.data;
 	var multi = redis_client.multi();
 	$.each(result,function(attr,value){
-		redis_client.setnx('facebook.post:'+this.id+':json', function(err, reply){
-		});
+		redis_client.setnx('facebook.post:'+this.id+':json', JSON.stringify(this));
 		multi.sadd(keyword+'.facebook.posts','facebook.post:'+this.id+':json');
 		if (this.type === "photo")
 		  multi.sadd(keyword+'.facebook.photos','facebook.post:'+this.id+':json');
 		
 		if (this.type === "video")
-		  multi.sadd(keyword+'.facebook.video','facebook.post:'+this.id+':json');
+		  multi.sadd(keyword+'.facebook.videos','facebook.post:'+this.id+':json');
+		
+		if (this.message){
+			var sentiment = analyze(this.message);
+			
+			if (sentiment.score > 0)
+			{
+				multi.sadd(keyword+'.positive.facebook.posts','facebook.post:'+this.id+':json');
+			} else {
+				if (sentiment.score < 0){
+					multi.sadd(keyword+'.negative.facebook.posts','facebook.post:'+this.id+':json');
+				}
+				if (sentiment.score === 0)
+				  multi.sadd(keyword+'.neutral.facebook.posts','facebook.post:'+this.id+':json');
+			}
+			
+			//console.log('Sentiment '+this.message+' '+JSON.stringify(sentiment));
+		}
+		
+		
 		
 	});
-	//console.log('keyword is '+keyword);
+	
 	var message = {"keyword":keyword,
 	               "count":null,
 	               "photos":null,
-	               "videos":null};
+	               "videos":null,
+	               "positive":null,
+	               "negative":null,
+	               "neutral":null};
 
 	multi.exec(function(err,replies){
 		
@@ -221,8 +247,20 @@ function processFacebook(data, keyword, socket){
 			message.photos = reply;
 		});
 
-		next_multi.scard(keyword+'.facebook.video',function(err, reply){
+		next_multi.scard(keyword+'.facebook.videos',function(err, reply){
 			message.videos = reply;
+		});
+		
+		next_multi.scard(keyword+'.positive.facebook.posts',function(err, reply){
+			message.positive = reply;
+		});
+		
+		next_multi.scard(keyword+'.negative.facebook.posts',function(err, reply){
+			message.negative = reply;
+		});
+		
+		next_multi.scard(keyword+'.neutral.facebook.posts',function(err, reply){
+			message.neutral = reply;
 		});
 		
 		next_multi.exec(function(err,replies){
@@ -245,12 +283,15 @@ function processTweet(tweet_json, socket){
         var len = keywords.length;
 		for (var i=0; i<len;i++)
 		{
-			if (tweet.text.indexOf(keywords[i]))
+			if (tweet.text.indexOf(keywords[i]) > 0)
 			{
-				redis_client.setnx('tweet:'+tweet.id_str+':json',escape(JSON.stringify(tweet_json)));
+				redis_client.setnx('tweet:'+tweet.id_str+':json',JSON.stringify(tweet_json));
 				var message = {"keyword":keywords[i],
 				               "count":null,
-				               "geo_count":null};
+				               "geo_count":null,
+				               "positive":null,
+				               "negative":null,
+				               "neutral":null};
 				multi.sadd(keywords[i]+'.tweets','tweet:'+tweet.id_str+':json');
 				multi.scard(keywords[i]+'.tweets', function(err, reply){
 					//console.log('recv from redis: '+ reply)
@@ -259,12 +300,41 @@ function processTweet(tweet_json, socket){
 				//console.log('inside processTweet found match');
 				if (tweet.geo)
 				{
-					multi.sadd(keywords[i]+'.geo', 'tweet:'+tweet.id_str+':json');
-					multi.scard(keywords[i]+'.geo', function(err, reply){
+					multi.sadd(keywords[i]+'.geocoded.tweets', 'tweet:'+tweet.id_str+':json');
+					multi.scard(keywords[i]+'.geocoded.tweets', function(err, reply){
 						//console.log('recv from geo redis: '+ reply)
 						message.geo_count = reply;
 					});
 				}
+				
+				var sentiment = analyze(tweet.text);
+				
+				if (sentiment.score > 0){
+					multi.sadd(keywords[i]+'.positive.tweets', 'tweet:'+tweet.id_str+':json');
+					multi.scard(keywords[i]+'.positive.tweets', function(err, reply){
+						//console.log('recv from geo redis: '+ reply)
+						message.positive = reply;
+					});
+					
+				}
+				
+				if (sentiment.score < 0){
+					multi.sadd(keywords[i]+'.negative.tweets', 'tweet:'+tweet.id_str+':json');
+					multi.scard(keywords[i]+'.negative.tweets', function(err, reply){
+						//console.log('recv from geo redis: '+ reply)
+						message.negative = reply;
+					});
+					
+				}
+				if (sentiment.score === 0){
+					multi.sadd(keywords[i]+'.neutral.tweets', 'tweet:'+tweet.id_str+':json');
+					multi.scard(keywords[i]+'.neutral.tweets', function(err, reply){
+						//console.log('recv from geo redis: '+ reply)
+						message.neutral = reply;
+					});
+					
+				}
+				
 				multi.exec(function (err, replies) {
 				      socket.emit('tweet',JSON.stringify(message));
 				    });

@@ -50,7 +50,7 @@
 
 <!---BEGIN CONTAINER-->
 
-    <div style="margin-top:40px;">
+    <div class="container" style="margin-top:40px;">
       <!--MAIN CONTENT BEGIN-->
       <div class="row-fluid">
         <!---BEGIN COLUMN 1 contains MAP, Overlay Checkboxes, and Results Table-->
@@ -103,8 +103,9 @@
 	                   <th>Images</th>
 	                   <th>Video</th>
 	                   <th>Geocoded</th>
-	                   <th>Sentiment</th>
-	                   <th>Actions</th>
+	                   <th>Positive</th>
+	                   <th>Negative</th>
+	                   <th>Neutral</th>
 	                 </tr>
 	               </thead>
 	             </table>
@@ -134,7 +135,7 @@
 			         
 			         <div class="control-group">
 				        <div class="controls">
-				          	<input type="text" class="input-large" id="keyword_input" placeholder="New keyword"> <button type='button' class='btn' onclick='addKeyword()' style='margin-top:-10px;'><i class="icon-plus"></i></button>
+				          	<input type="text" class="input-medium" id="keyword_input" placeholder="New keyword"> <button type='button' class='btn' onclick='addKeyword()' style='margin-top:-10px;'><i class="icon-plus"></i></button>
 							  <div id="keywords"></div>
 						  <button type="button" class="btn btn-mini" style="">Upload Keyword File</button><br><br>
 					      <label class="checkbox inline">
@@ -172,7 +173,7 @@
 							<span class="add-on">
 							  <i class="icon-map-marker"></i>
 							</span>
-			              <input type="text" class="input-large" id="map_coordinates" >
+			              <input type="text" class="input-medium" id="map_coordinates" >
 			              </div>
 			              
 			             <label class="checkbox">
@@ -202,12 +203,12 @@
 			          <div class="control-group" style="margin-top:15px;">
 			             <label class="control-label" for="send_to" style="width:auto;">TO: </label>
 			           	<div class="controls" style="margin-left:30px;">
-			              <input type="text" class="input-large" id="send_to" placeholder="Add Recipient" >
+			              <input type="text" class="input-medium" id="send_to" placeholder="Add Recipient" >
 			            </div> 
 			           <div class="control-group" style="margin-top:15px;">
 			              <label class="control-label" for="report_description" style="width:auto;">RE: </label>
 			            <div class="controls" style="margin-left:30px;">
-			              <input type="text" class="input-large" id="report_description" placeholder="Report Description">
+			              <input type="text" class="input-medium" id="report_description" placeholder="Report Description">
 			            </div>
 			           </div>
 			            <span class="badge badge-info">0</span> ATTACHMENTS <button type='button' class='btn btn-primary pull-right' style="margin-top:-8px;margin-right:30px;">SEND</button>

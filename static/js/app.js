@@ -46,9 +46,19 @@ $('#map_coordinates').focus(function(){
 $('#map_coordinates').keydown(function(e){
 	if(e.keyCode == 13){
 		e.preventDefault();
+		e.stopPropagation();
 		updateMap();
 	}
 });
+
+$('#keyword_input').keydown(function(e){
+	if(e.keyCode == 13){
+		e.preventDefault();
+		e.stopPropagation();
+		addKeyword();
+	}
+});
+
 
 function updateMap(){
 	var address = $("#map_coordinates").val();
@@ -100,6 +110,15 @@ socket.on('tweet',function(json){
 	if (tweet.geo_count)
 	  $('#'+getDivName(tweet.keyword)+'_tgeocoded').html(tweet.geo_count);
 	
+	if (tweet.positive)
+	  $('#'+getDivName(tweet.keyword)+'_tpositive').html(tweet.positive);
+
+	if (tweet.negative)
+	  $('#'+getDivName(tweet.keyword)+'_tnegative').html(tweet.negative);
+	
+	if (tweet.neutral)
+	  $('#'+getDivName(tweet.keyword)+'_tneutral').html(tweet.neutral);
+	
 	
 	
 	/*if ((!tweet.retweeted))
@@ -133,6 +152,15 @@ socket.on('fbresults',function(json){
 	
 	if (fbresults.videos)
 	  $('#'+getDivName(fbresults.keyword)+'_fvideos').html(fbresults.videos);
+	
+	if (fbresults.positive)
+	  $('#'+getDivName(fbresults.keyword)+'_fpositive').html(fbresults.positive);
+	
+	if (fbresults.negative)
+	  $('#'+getDivName(fbresults.keyword)+'_fnegative').html(fbresults.negative);
+	
+	if (fbresults.neutral)
+	  $('#'+getDivName(fbresults.keyword)+'_fneutral').html(fbresults.neutral);
 	
 });
 
@@ -194,7 +222,7 @@ function tweetContainsKeyword(tweet)
     var len = tracks.length;
 	for (var i= 0; i < len; i++)
 	{
-		if (tweet.text.indexOf(tracks[i]))
+		if (tweet.text.indexOf(tracks[i]) > 0)
 		{
 		  return true;
 		}
@@ -230,8 +258,9 @@ function twitterToggle(){
 			  +getDivName(tracks[i])+'_timages">tbd</td><td id="'
 			  +getDivName(tracks[i])+'_tvideos">tbd</td><td id="'
 			  +getDivName(tracks[i])+'_tgeocoded">0</td><td id="'
-			  +getDivName(tracks[i])+'_tsentiment">tbd</td><td id="'
-			  +getDivName(tracks[i])+'_taction"><button class="btn btn-mini">Expand</button></td></tr>');
+			  +getDivName(tracks[i])+'_tpositive">tbd</td><td id="'
+			  +getDivName(tracks[i])+'_tnegative">tbd</td><td id="' 
+			  +getDivName(tracks[i])+'_tneutral">tbd</td></tr>');
 			
 
 		} else {
@@ -249,11 +278,12 @@ function facebookToggle(){
 			$('thead').after('<tr id='+getDivName(tracks[i])+'_facebook><td>Facebook</td><td>'
 			  +tracks[i]+'</td><td id="'
 			  +getDivName(tracks[i])+'_fcount">0</td><td id="'
-			  +getDivName(tracks[i])+'_fimages">tbd</td><td id="'
-			  +getDivName(tracks[i])+'_fvideos">tbd</td><td id="'
-			  +getDivName(tracks[i])+'_fgeocoded">tbd</td><td id="'
-			  +getDivName(tracks[i])+'_fsentiment">tbd</td><td id="'
-			  +getDivName(tracks[i])+'_faction"><button class="btn btn-mini">Expand</button></td></tr>');
+			  +getDivName(tracks[i])+'_fimages">0</td><td id="'
+			  +getDivName(tracks[i])+'_fvideos">0</td><td id="'
+			  +getDivName(tracks[i])+'_fgeocoded">na</td><td id="'
+			  +getDivName(tracks[i])+'_fpositive">0</td><td id="'
+			  +getDivName(tracks[i])+'_fnegative">0</td><td id="'
+			  +getDivName(tracks[i])+'_fneutral">0</td></tr>');
 			  
 		} else {
           $('#'+getDivName(tracks[i])+'_facebook').remove();
@@ -274,8 +304,9 @@ function rssToggle(){
 			  +getDivName(tracks[i])+'_rimages">tbd</td><td id="'
 			  +getDivName(tracks[i])+'_rvideos">tbd</td><td id="'
 			  +getDivName(tracks[i])+'_rgeocoded">0</td><td id="'
-			  +getDivName(tracks[i])+'_rsentiment">tbd</td><td id="'
-			  +getDivName(tracks[i])+'_raction"><button class="btn btn-mini">Expand</button></td></tr>');
+			  +getDivName(tracks[i])+'_rpositive">tbd</td><td id="'
+			  +getDivName(tracks[i])+'_rnegative">tbd</td><td id="'
+			  +getDivName(tracks[i])+'_rneutral">tbd</td></tr>');
 		} else {
           $('#'+getDivName(tracks[i])+'_rss').remove();
 		}
