@@ -12,6 +12,6 @@
     "socket.io":"latest",
     "redis":"latest",
     "jQuery":"latest",
-    "Sentimental":"latest"
+    "Sentimental": "latest"
    }
 }
