@@ -8,7 +8,7 @@
   <body>
 	<h3 class="capitalize"><%= title %></h3>
     <ul>
-		<% var len = tweets.length - 1%>
+		<% var len = tweets.length %>
 		<% for (var i=0; i<len; i++) { %>
 			<% var tweet = JSON.parse(tweets[i]) %>
 			<li><%= tweet.user.screen_name %>: <%= tweet.text %></li>
