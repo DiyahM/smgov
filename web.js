@@ -321,6 +321,9 @@ function processTweet(tweet_json, socket){
         var len = keywords.length;
 		for (var i=0; i<len;i++)
 		{
+			if (tweet.geo)
+			  socket.emit('geo_tweet',JSON.stringify(tweet_json));
+			
 			if (tweet.text.indexOf(keywords[i]) > 0)
 			{
 				var keyword = keywords[i].split(" ").join("_");
@@ -343,6 +346,7 @@ function processTweet(tweet_json, socket){
 					multi.scard(keyword+'.tweets.geo', function(err, reply){
 						//console.log('recv from geo redis: '+ reply)
 						message.geo_count = reply;
+						socket.emit('geo_tweet',JSON.stringify())
 					});
 				}
 				

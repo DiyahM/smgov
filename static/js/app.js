@@ -16,7 +16,7 @@ navigator.geolocation.getCurrentPosition(function(data) {
 		//centering on bethesda for demo purposes
 		var map_center = new google.maps.LatLng('38.9995335', '-77.0968425');
 		map = new google.maps.Map(document.getElementById("map_canvas"), {
-		  zoom: 10,
+		  zoom: 11,
 		  center: map_center,
 		  mapTypeId: google.maps.MapTypeId.ROADMAP
 		});
@@ -181,58 +181,48 @@ socket.on('fbresults',function(json){
 	
 });
 
+socket.on('geo_tweet',function(json){
+	
+	if ($("#geo_checkbox").attr('checked'))
+	{
+		var tweet = JSON.parse(json);
+		var latlng = new google.maps.LatLng(tweet.geo.coordinates[0], tweet.geo.coordinates[1]);
+
+
+	    if (latlng)
+	    {
+		    if (map.getBounds().contains(latlng))
+			{
+			    infowindows[infowindows.length] = new google.maps.InfoWindow({
+					content: tweet.user.screen_name + ':' + tweet.text,
+					maxWidth: '200px'
+				});
+			
+				markers[markers.length] = new google.maps.Marker({
+					map: map,
+					position: latlng,
+					icon: tweet.user.profile_image_url,
+					clickable: true,
+					title: tweet.user.screen_name,
+					visible:true
+				});
+			
+				google.maps.event.addListener(markers[markers.length-1],'click',function(){
+					infowindows[$.inArray(this,markers)].open(map,this);
+				});
+
+		    }
+	    }
+    }
+	
+});
+
 function getDivName(keyword)
 {
 	temp = keyword.split(' ').join("_");
 	return temp;
 }
 
-
-
-function withinGeoBounds(tweet)
-{
-	
-	var latlng;
-	if (!tweet.geo)
-	{
-		/*geocoder.geocode({'address':tweet.user.location}, function(results,status){
-			if (status == google.maps.GeocoderStatus.OK)
-			{
-				latlng = results[0].geometry.location;
-			} else{
-				console.log('no good user from '+tweet.user.location +' '+ status);
-			}
-		});*/
-    } else {
-	    latlng = new google.maps.LatLng(tweet.geo.coordinates[0], tweet.geo.coordinates[1]);
-    }
-
-    if (latlng)
-    {
-	    if (map.getBounds().contains(latlng))
-		{
-		    infowindows[infowindows.length] = new google.maps.InfoWindow({
-				content: tweet.user.screen_name + ':' + tweet.text,
-				maxWidth: '200px'
-			});
-			
-			markers[markers.length] = new google.maps.Marker({
-				map: map,
-				position: latlng,
-				icon: tweet.user.profile_image_url,
-				clickable: true,
-				title: tweet.user.screen_name
-			});
-			
-			google.maps.event.addListener(markers[markers.length-1],'click',function(){
-				infowindows[$.inArray(this,markers)].open(map,this);
-			});
-			
-			return true;
-	    }
-    }
-	return false;
-}
 
 function createDCTrafficCams(){
 	
@@ -392,7 +382,7 @@ function cameraToggle(){
 	if ($('#camera_checkbox').attr('checked')){
 		
 		for (var i=0;i<len;i++){
-			console.log('set to true');
+		
 			dc_cams[i].setVisible(true);
 			
 			
@@ -400,6 +390,22 @@ function cameraToggle(){
 	} else {
 		for (var i=0;i<len;i++){
 			dc_cams[i].setVisible(false);
+		}
+	}
+	
+}
+
+function geoToggle(){
+	var len = markers.length;
+	if ($('#geo_checkbox').attr('checked')){
+		
+		for (var i=0;i<len;i++){	
+			markers[i].setVisible(true);
+			
+		}
+	} else {
+		for (var i=0;i<len;i++){
+			markers[i].setVisible(false);
 		}
 	}
 	
