@@ -4,7 +4,7 @@ var express = require('express'),
     io = require('socket.io'),
     redis = require('redis'),
     $ = require('jQuery'),
-    analyze = require('sentimental').analyze;
+    analyze = require('Sentimental').analyze;
 
 var app = express.createServer(express.logger());
 
