@@ -5,13 +5,16 @@ var stream_location;
 var tweet_count = 0;
 var markers = [];
 var infowindows = [];
+var dc_cams=[];
 
 //html5 get user's location coordinates
 navigator.geolocation.getCurrentPosition(function(data) {
 	     var lat = data['coords']['latitude']; 
 	     var lng = data['coords']['longitude'];
 	
-		var map_center = new google.maps.LatLng(lat, lng); 
+		//var map_center = new google.maps.LatLng(lat, lng); 
+		//centering on bethesda for demo purposes
+		var map_center = new google.maps.LatLng('38.9995335', '-77.0968425');
 		map = new google.maps.Map(document.getElementById("map_canvas"), {
 		  zoom: 10,
 		  center: map_center,
@@ -28,6 +31,7 @@ function next(){
 	updatePositionInputField();
 	//console.log('bounds event');
   });
+  createDCTrafficCams();
 
 }
 
@@ -230,6 +234,42 @@ function withinGeoBounds(tweet)
 	return false;
 }
 
+function createDCTrafficCams(){
+	
+	/*var dc_locations = ["Colesville Rd and Fenton St, Silver Spring, MD","Georgia Ave and Sligo Ave, Silver Spring, MD","East West Hwy and Georgia Ave, Silver Spring, MD",
+	                     "East West Hwy and Wisconsin Ave, Bethesda, MD", "Rockville Pk and South Dr, Bethesda, MD","Bradley Blvd and Wisconsin Ave, Bethesda, MD",
+	                      "Bradley Blvd and Connecticut Ave, Bethesda, MD", "Connecticut and East West Hwy, Bethesda, MD"];*/
+	var dc_links =["/video/video.asp?feed=13015dbd01210075004d823633235daa","/video/video.asp?feed=0601f50e012b0075004d823633235daa","/video/video.asp?feed=ae01694b01220075004d823633235daa",
+             "/video/video.asp?feed=efff918500020075004d823633235daa","/video/video.asp?feed=f400498202500075004d823633235daa","/video/video.asp?feed=f70054e703e00077004d823633235daa",
+             "/video/video.asp?feed=a1008d3b00020075004d823633235daa","/video/video.asp?feed=0b01b57900060075004d823633235daa"];
+	
+	var dc_latlng = [{"coordinates":['38.9976537', '-77.0270182']},
+	                 {"coordinates":['38.9902652', '-77.0265793']},
+	                 {"coordinates":['38.9876015',' -77.0267504']},
+					 {"coordinates":['38.9846986','-77.0942903']},
+					 {"coordinates":['38.9995335','-77.0968425']},
+					 {"coordinates":['38.9772353','-77.0907848']},
+					 {"coordinates":['38.9767382','-77.0772258']},
+					 {"coordinates":['38.9879499','-77.0771028']},
+	];
+	for (var i=0;i<8;i++){
+		dc_cams[i] = new google.maps.Marker({
+			map:map,
+			position: new google.maps.LatLng(dc_latlng[i].coordinates[0], dc_latlng[i].coordinates[1]),
+			clickable:true,
+			icon:'/img/cam_Icon.png'
+		
+		});
+		var url = "http://www.chart.state.md.us"+dc_links[i];
+		
+		google.maps.event.addListener(dc_cams[i],'click',function(){
+			window.open(url,"Traffic Cam","toolbar=0,location=0,menubar=0,directories=0,resizable=1;scrollbars=0,width=480,height=360");
+		});
+		
+	}
+
+}
+
 function tweetContainsKeyword(tweet)
 {
     var len = tracks.length;
@@ -258,6 +298,8 @@ function addKeyword(){
 	}
 		
 }
+
+
 
 
 function twitterToggle(){
@@ -341,6 +383,24 @@ function rssToggle(){
           $('#'+getDivName(tracks[i])+'_rss').remove();
 		}
 		
+	}
+	
+}
+
+function cameraToggle(){
+	var len = dc_cams.length;
+	if ($('#camera_checkbox').attr('checked')){
+		
+		for (var i=0;i<len;i++){
+			console.log('set to true');
+			dc_cams[i].setVisible(true);
+			
+			
+		}
+	} else {
+		for (var i=0;i<len;i++){
+			dc_cams[i].setVisible(false);
+		}
 	}
 	
 }

@@ -58,7 +58,7 @@
           
          <!--MAP BEGIN--> 
 		     <div class="row-fluid">
-	            <div id="map_canvas" class="fullscreen">Loading map...</div>
+	            <div id="map_canvas" class="halfscreen">Loading map...</div>
 	          </div>
 	     <!--MAP END--> 
 	     <!--Overlays BEGIN-->
@@ -70,22 +70,22 @@
 			          <label class="checkbox inline"><strong>Data Layers:</strong> 
 				      </label>
 				      <label class="checkbox inline">
-				        <input type="checkbox" id="camera_checkbox" value="">Traffic Cameras (Baltimore, MD)
+				        <input type="checkbox" id="camera_checkbox" value="" onclick="cameraToggle()" checked>Traffic Cameras (DC Area Only)
 				      </label>
 				      <label class="checkbox inline">
-				        <input type="checkbox" id="twitter_sentiment_checkbox" value="">Images
+				        <input type="checkbox" id="twitter_sentiment_checkbox" value="" disabled>Images
 				      </label>
 				      <label class="checkbox inline">
-				        <input type="checkbox" id="police_checkbox" value="">Police Stations
+				        <input type="checkbox" id="police_checkbox" value="" disabled>Police Stations
 				      </label>
 				      <label class="checkbox inline">
-				        <input type="checkbox" id="fire_dept_checkbox" value="">Hospitals
+				        <input type="checkbox" id="fire_dept_checkbox" value="" disabled>Hospitals
 				      </label>
 				      <label class="checkbox inline">
-				        <input type="checkbox" id="hospital_checkbox" value="">{Custom Defined}
+				        <input type="checkbox" id="hospital_checkbox" value="" disabled>{Custom Defined}
 				      </label>
 				      
-				      <button type="button" class="btn btn-mini" style="margin-left:8px;"><i class="icon-map-marker"></i>Upload Map Overlays File</button> 
+				      <button type="button" class="btn btn-mini disabled" style="margin-left:8px;"><i class="icon-map-marker"></i>Upload Map Overlays File</button> 
 				    </div>
 			      </div>
 			</div>
@@ -121,7 +121,7 @@
         <!--COLUMN2 BEGIN for search, location, and spot report-->  
         <div class="span3 offset2">
           <!--Record button begin -->
-          <div class="row-fluid"><button class="btn" style="width:95%;margin:10px;">Record Data Stream</button></div>
+          <div class="row-fluid"><button class="btn disabled" style="width:95%;margin:10px;">Record Data Stream</button></div>
            <!--Record button end -->
         <!--SEARCH BEGIN-->
            <div class="row-fluid">
@@ -137,23 +137,23 @@
 				        <div class="controls">
 				          	<input type="text" class="input-medium" id="keyword_input" placeholder="New keyword"> <button type='button' class='btn' onclick='addKeyword()' style='margin-top:-10px;'><i class="icon-plus"></i></button>
 							  <div id="keywords"></div>
-						  <button type="button" class="btn btn-mini" style="">Upload Keyword File</button><br><br>
+						  <button type="button" class="btn btn-mini disabled" style="">Upload Keyword File</button><br><br>
 					      <label class="checkbox inline">
-					        <input type="checkbox" id="twitter_checkbox" value="" onclick="twitterToggle()">Twitter
+					        <input type="checkbox" id="twitter_checkbox" value="" onclick="twitterToggle()" checked>Twitter
 					      </label>
 					      <label class="checkbox inline">
-					        <input type="checkbox" id="facebook_checkbox" value="" onclick="facebookToggle()">Facebook
+					        <input type="checkbox" id="facebook_checkbox" value="" onclick="facebookToggle()" checked>Facebook
 					      </label>
 				          <label class="checkbox inline">
-					        <input type="checkbox" id="rss_checkbox" value="" onclick="rssToggle()">RSS
+					        <input type="checkbox" id="rss_checkbox" value="" onclick="rssToggle()" disabled>RSS
 					      </label>
 					      <label class="checkbox">
-					        <input type="checkbox" id="custom_checkbox" value="">{Custom User Defined}
+					        <input type="checkbox" id="custom_checkbox" value="" disabled>{Custom User Defined}
 					      </label>
 					      
 					    </div>
 				      </div>
-				       <button type='button' class='btn'>Save Search</button> <button type='button' class='btn btn-primary' onclick="search()">Search</button> 
+				       <button type='button' class='btn disabled'>Save Search</button> <button type='button' class='btn btn-primary' onclick="search()">Search</button> 
 				  </fieldset>   
 				  </form>
 				</div>
@@ -177,7 +177,7 @@
 			              </div>
 			              
 			             <label class="checkbox">
-					        <input type="checkbox" id="twitter_trends_checkbox" value="">Show Twitter Trends For Location
+					        <input type="checkbox" id="twitter_trends_checkbox" value="" disabled>Show Twitter Trends For Location
 					      </label>
 			            </div>
 			          </div>
@@ -211,7 +211,7 @@
 			              <input type="text" class="input-medium" id="report_description" placeholder="Report Description">
 			            </div>
 			           </div>
-			            <span class="badge badge-info">0</span> ATTACHMENTS <button type='button' class='btn btn-primary pull-right' style="margin-top:-8px;margin-right:30px;">SEND</button>
+			            <span class="badge badge-info">0</span> ATTACHMENTS <button type='button' class='btn btn-primary pull-right disabled' style="margin-top:-8px;margin-right:30px;">SEND</button>
 			          </div>
 				      
 
