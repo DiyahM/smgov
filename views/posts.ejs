@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  	<!-- styles -->
+    <link href="/css/bootstrap.css" rel="stylesheet">
+    <link href="/css/bootstrap-responsive.min.css" rel="stylesheet">
+  </head>
+  <body>
+	<h3 class="capitalize"><%= title %></h3>
+    <ul>
+	  		<% var len = posts.length %>
+			<% for (var i=0; i<len; i++) { %>
+				<% var post = JSON.parse(posts[i]) %>
+				<li><%= post.from.name %>: <%= post.message %></li>
+			<% } %>
+    </ul>
+  </body>
+</html>

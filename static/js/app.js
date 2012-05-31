@@ -59,6 +59,19 @@ $('#keyword_input').keydown(function(e){
 	}
 });
 
+$('#keyword_input').focusout(function(){
+	addKeyword();
+});
+
+
+function openAsPopup(a){
+	var url = $(a).attr('href');
+	window.open(url,"Data Window","toolbar=0,location=0,menubar=0,directories=0,resizable=1;scrollbars=1,width=350,height=500");
+
+}
+
+
+
 
 function updateMap(){
 	var address = $("#map_coordinates").val();
@@ -105,19 +118,19 @@ socket.on('tweet',function(json){
 	//console.log('tweet received ' + json);
 	
 	if (tweet.count)
-	  $('#'+getDivName(tweet.keyword)+'_tcount').html(tweet.count);
+	  $('#'+tweet.keyword+'_tcount a').html(tweet.count);
 	
 	if (tweet.geo_count)
-	  $('#'+getDivName(tweet.keyword)+'_tgeocoded').html(tweet.geo_count);
+	  $('#'+tweet.keyword+'_tgeocoded a').html(tweet.geo_count);
 	
 	if (tweet.positive)
-	  $('#'+getDivName(tweet.keyword)+'_tpositive').html(tweet.positive);
+	  $('#'+tweet.keyword+'_tpositive a').html(tweet.positive);
 
 	if (tweet.negative)
-	  $('#'+getDivName(tweet.keyword)+'_tnegative').html(tweet.negative);
+	  $('#'+tweet.keyword+'_tnegative a').html(tweet.negative);
 	
 	if (tweet.neutral)
-	  $('#'+getDivName(tweet.keyword)+'_tneutral').html(tweet.neutral);
+	  $('#'+tweet.keyword+'_tneutral a').html(tweet.neutral);
 	
 	
 	
@@ -145,28 +158,28 @@ socket.on('fbresults',function(json){
 	//console.log('fb received ' + json);
 	
 	if (fbresults.count)
-	  $('#'+getDivName(fbresults.keyword)+'_fcount').html(fbresults.count);
+	  $('#'+fbresults.keyword+'_fcount a').html(fbresults.count);
 	
 	if (fbresults.photos)
-	  $('#'+getDivName(fbresults.keyword)+'_fimages').html(fbresults.photos);
+	  $('#'+fbresults.keyword+'_fimages a').html(fbresults.photos);
 	
 	if (fbresults.videos)
-	  $('#'+getDivName(fbresults.keyword)+'_fvideos').html(fbresults.videos);
+	  $('#'+fbresults.keyword+'_fvideos a').html(fbresults.videos);
 	
 	if (fbresults.positive)
-	  $('#'+getDivName(fbresults.keyword)+'_fpositive').html(fbresults.positive);
+	  $('#'+fbresults.keyword+'_fpositive a').html(fbresults.positive);
 	
 	if (fbresults.negative)
-	  $('#'+getDivName(fbresults.keyword)+'_fnegative').html(fbresults.negative);
+	  $('#'+fbresults.keyword+'_fnegative a').html(fbresults.negative);
 	
 	if (fbresults.neutral)
-	  $('#'+getDivName(fbresults.keyword)+'_fneutral').html(fbresults.neutral);
+	  $('#'+fbresults.keyword+'_fneutral a').html(fbresults.neutral);
 	
 });
 
 function getDivName(keyword)
 {
-	temp = keyword.split(' ').join("");
+	temp = keyword.split(' ').join("_");
 	return temp;
 }
 
@@ -246,21 +259,30 @@ function addKeyword(){
 		
 }
 
+
 function twitterToggle(){
 	
 	var len = tracks.length;
 	for (var i=0;i<len;i++){
 		if ($('#twitter_checkbox').attr('checked'))
 		{
-			$('thead').after('<tr id='+getDivName(tracks[i])+'_twitter><td>Twitter</td><td>'
-			  +tracks[i]+'</td><td id="'
-			  +getDivName(tracks[i])+'_tcount">0</td><td id="'
-			  +getDivName(tracks[i])+'_timages">tbd</td><td id="'
-			  +getDivName(tracks[i])+'_tvideos">tbd</td><td id="'
-			  +getDivName(tracks[i])+'_tgeocoded">0</td><td id="'
-			  +getDivName(tracks[i])+'_tpositive">tbd</td><td id="'
-			  +getDivName(tracks[i])+'_tnegative">tbd</td><td id="' 
-			  +getDivName(tracks[i])+'_tneutral">tbd</td></tr>');
+			if ($('#'+getDivName(tracks[i])+'_twitter').length == 0){
+				$('thead').after('<tr id='+getDivName(tracks[i])+'_twitter><td>Twitter</td><td><a href="/'+getDivName(tracks[i])+'/tweets/all" onclick="openAsPopup(this)">'
+				  +tracks[i]+'</a></td><td id="'
+				  +getDivName(tracks[i])+'_tcount"><a href="/'+getDivName(tracks[i])+'/tweets/all" onclick="openAsPopup(this)"></a></td><td id="'
+				  +getDivName(tracks[i])+'_timages">tbd</td><td id="'
+				  +getDivName(tracks[i])+'_tvideos">tbd</td><td id="'
+				  +getDivName(tracks[i])+'_tgeocoded"><a href="/'+getDivName(tracks[i])+'/tweets/geo" onclick="openAsPopup(this)"></a></td><td id="'
+				  +getDivName(tracks[i])+'_tpositive"><a href="/'+getDivName(tracks[i])+'/tweets/positive" onclick="openAsPopup(this)"></a></td><td id="'
+				  +getDivName(tracks[i])+'_tnegative"><a href="/'+getDivName(tracks[i])+'/tweets/negative" onclick="openAsPopup(this)"></a></td><td id="' 
+				  +getDivName(tracks[i])+'_tneutral"><a href="/'+getDivName(tracks[i])+'/tweets/neutral" onclick="openAsPopup(this)"></a></td></tr>');
+
+					$('#'+getDivName(tracks[i])+'_twitter a').click(function(e){
+						e.preventDefault();
+					});
+				
+			}
+			
 			
 
 		} else {
@@ -270,20 +292,28 @@ function twitterToggle(){
 	}	
 }
 
+
 function facebookToggle(){
 	var len = tracks.length;
 	for (var i=0;i<len;i++){
 		if ($('#facebook_checkbox').attr('checked'))
 		{
-			$('thead').after('<tr id='+getDivName(tracks[i])+'_facebook><td>Facebook</td><td>'
-			  +tracks[i]+'</td><td id="'
-			  +getDivName(tracks[i])+'_fcount">0</td><td id="'
-			  +getDivName(tracks[i])+'_fimages">0</td><td id="'
-			  +getDivName(tracks[i])+'_fvideos">0</td><td id="'
-			  +getDivName(tracks[i])+'_fgeocoded">na</td><td id="'
-			  +getDivName(tracks[i])+'_fpositive">0</td><td id="'
-			  +getDivName(tracks[i])+'_fnegative">0</td><td id="'
-			  +getDivName(tracks[i])+'_fneutral">0</td></tr>');
+			if ($('#'+getDivName(tracks[i])+'_facebook').length == 0){
+				$('thead').after('<tr id='+getDivName(tracks[i])+'_facebook><td>Facebook</td><td><a href="/'+getDivName(tracks[i])+'/facebook/all" onclick="openAsPopup(this)">'
+				  +tracks[i]+'</a></td><td id="'
+				  +getDivName(tracks[i])+'_fcount"><a href="/'+getDivName(tracks[i])+'/facebook/all" onclick="openAsPopup(this)"></a></td><td id="'
+				  +getDivName(tracks[i])+'_fimages"><a href="/'+getDivName(tracks[i])+'/facebook/photos" onclick="openAsPopup(this)"></a></td><td id="'
+				  +getDivName(tracks[i])+'_fvideos"><a href="/'+getDivName(tracks[i])+'/facebook/videos" onclick="openAsPopup(this)"></a></td><td id="'
+				  +getDivName(tracks[i])+'_fgeocoded">na</td><td id="'
+				  +getDivName(tracks[i])+'_fpositive"><a href="/'+getDivName(tracks[i])+'/facebook/positive" onclick="openAsPopup(this)"></a></td><td id="'
+				  +getDivName(tracks[i])+'_fnegative"><a href="/'+getDivName(tracks[i])+'/facebook/negative" onclick="openAsPopup(this)"></a></td><td id="'
+				  +getDivName(tracks[i])+'_fneutral"><a href="/'+getDivName(tracks[i])+'/facebook/neutral" onclick="openAsPopup(this)"></a></td></tr>');
+				$('#'+getDivName(tracks[i])+'_facebook a').click(function(e){
+					e.preventDefault();
+				});
+				
+			}
+			
 			  
 		} else {
           $('#'+getDivName(tracks[i])+'_facebook').remove();
@@ -298,8 +328,8 @@ function rssToggle(){
 	for (var i=0;i<len;i++){
 		if ($('#rss_checkbox').attr('checked'))
 		{
-			$('thead').after('<tr id='+getDivName(tracks[i])+'_rss><td>RSS</td><td>'
-			  +tracks[i]+'</td><td id="'
+			$('thead').after('<tr id='+getDivName(tracks[i])+'_rss><td>RSS</td><td><a href="/'+getDivName(tracks[i])+'/rss_links/all">'
+			  +tracks[i]+'</a></td><td id="'
 			  +getDivName(tracks[i])+'_rcount">0</td><td id="'
 			  +getDivName(tracks[i])+'_rimages">tbd</td><td id="'
 			  +getDivName(tracks[i])+'_rvideos">tbd</td><td id="'

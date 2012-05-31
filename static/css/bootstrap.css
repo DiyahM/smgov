@@ -29,6 +29,7 @@ section {
 #map_canvas img{max-width:none;}
 #map_canvas label{width:auto; display:inline;}
 .map_overlays{}
+.capitalize {text-transform:capitalize;}
 audio,
 canvas,
 video {
