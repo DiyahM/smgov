@@ -307,7 +307,9 @@ function twitterToggle(){
 				  +getDivName(tracks[i])+'_tgeocoded"><a href="/'+getDivName(tracks[i])+'/tweets/geo" onclick="openAsPopup(this)"></a></td><td id="'
 				  +getDivName(tracks[i])+'_tpositive"><a href="/'+getDivName(tracks[i])+'/tweets/positive" onclick="openAsPopup(this)"></a></td><td id="'
 				  +getDivName(tracks[i])+'_tnegative"><a href="/'+getDivName(tracks[i])+'/tweets/negative" onclick="openAsPopup(this)"></a></td><td id="' 
-				  +getDivName(tracks[i])+'_tneutral"><a href="/'+getDivName(tracks[i])+'/tweets/neutral" onclick="openAsPopup(this)"></a></td></tr>');
+				  +getDivName(tracks[i])+'_tneutral"><a href="/'+getDivName(tracks[i])+'/tweets/neutral" onclick="openAsPopup(this)"></a></td><td id="'
+				  +getDivName(tracks[i])+'_twords">tbd</td><td id="'
+				  +getDivName(tracks[i])+'_tnotes"><button class="btn btn-mini disabled">Add Note</button></td></tr>');
 
 					$('#'+getDivName(tracks[i])+'_twitter a').click(function(e){
 						e.preventDefault();
@@ -339,7 +341,9 @@ function facebookToggle(){
 				  +getDivName(tracks[i])+'_fgeocoded">na</td><td id="'
 				  +getDivName(tracks[i])+'_fpositive"><a href="/'+getDivName(tracks[i])+'/facebook/positive" onclick="openAsPopup(this)"></a></td><td id="'
 				  +getDivName(tracks[i])+'_fnegative"><a href="/'+getDivName(tracks[i])+'/facebook/negative" onclick="openAsPopup(this)"></a></td><td id="'
-				  +getDivName(tracks[i])+'_fneutral"><a href="/'+getDivName(tracks[i])+'/facebook/neutral" onclick="openAsPopup(this)"></a></td></tr>');
+				  +getDivName(tracks[i])+'_fneutral"><a href="/'+getDivName(tracks[i])+'/facebook/neutral" onclick="openAsPopup(this)"></a></td><td id="'
+				  +getDivName(tracks[i])+'_fwords">tbd</td><td id="'
+				  +getDivName(tracks[i])+'_fnotes"><button class="btn btn-mini disabled">Add Note</button></td></tr>');
 				$('#'+getDivName(tracks[i])+'_facebook a').click(function(e){
 					e.preventDefault();
 				});
@@ -368,7 +372,9 @@ function rssToggle(){
 			  +getDivName(tracks[i])+'_rgeocoded">0</td><td id="'
 			  +getDivName(tracks[i])+'_rpositive">tbd</td><td id="'
 			  +getDivName(tracks[i])+'_rnegative">tbd</td><td id="'
-			  +getDivName(tracks[i])+'_rneutral">tbd</td></tr>');
+			  +getDivName(tracks[i])+'_rneutral">tbd</td><td id="'
+			  +getDivName(tracks[i])+'_rwords">tbd</td>	<td id="'
+			  +getDivName(tracks[i])+'_rnotes"><button class="btn btn-mini disabled">Add Note</button></td></tr>');
 		} else {
           $('#'+getDivName(tracks[i])+'_rss').remove();
 		}
