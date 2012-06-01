@@ -6,6 +6,7 @@ var tweet_count = 0;
 var markers = [];
 var infowindows = [];
 var dc_cams=[];
+var dc_infowindow=[];
 
 //html5 get user's location coordinates
 navigator.geolocation.getCurrentPosition(function(data) {
@@ -243,6 +244,12 @@ function createDCTrafficCams(){
 					 {"coordinates":['38.9879499','-77.0771028']},
 	];
 	for (var i=0;i<8;i++){
+		
+		var url = "http://www.chart.state.md.us"+dc_links[i];
+		dc_infowindow[i] = new google.maps.InfoWindow({
+		    content: '<a href="'+url+'" target="_blank">Open in new window</a><iframe frameborder=0 width="490px" height="370px" src="'+url+'">doesnt support iframe</iframe>'
+		});
+		
 		dc_cams[i] = new google.maps.Marker({
 			map:map,
 			position: new google.maps.LatLng(dc_latlng[i].coordinates[0], dc_latlng[i].coordinates[1]),
@@ -250,10 +257,12 @@ function createDCTrafficCams(){
 			icon:'/img/cam_Icon.png'
 		
 		});
-		var url = "http://www.chart.state.md.us"+dc_links[i];
-		
+	
 		google.maps.event.addListener(dc_cams[i],'click',function(){
-			window.open(url,"Traffic Cam","toolbar=0,location=0,menubar=0,directories=0,resizable=1;scrollbars=0,width=480,height=360");
+			dc_infowindow[$.inArray(this,dc_cams)].open(map,this);
+			//newWin = window.open(url,"Traffic Cam","width=490,height=370,left=100,top=200,location=no,directories=no,status=no,menubar=no,toolbar=no,resizable=no");
+			//newWin.focus();
+			//alert('happen');
 		});
 		
 	}
