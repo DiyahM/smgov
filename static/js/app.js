@@ -7,6 +7,7 @@ var markers = [];
 var infowindows = [];
 var dc_cams=[];
 var dc_infowindow=[];
+var first_load=true;
 
 //html5 get user's location coordinates
 navigator.geolocation.getCurrentPosition(function(data) {
@@ -36,6 +37,19 @@ function next(){
 
 }
 
+$('#keyword_input').popover({placement:'left',title:'Start Here',trigger:'manual',content:'<ol><li>Use the the keyword box to enter a search term.</li><li>Click the "+" button to add each keyword</li><li>Select which feeds to search using the checkboxes</li><li>Click the Search button to see your results</li>'});
+$('#keyword_input').popover('show');
+$('#data_table').popover({animation:true,placement:'top',title:'See your results',trigger:'manual',content:'This table shows your aggregated results. Use the hyperlinks in the table to see the individual results.<p><a href="#" onclick="closeResultsPopup();">Close</a></p>'});
+function closeResultsPopup(){
+	$('#data_table').popover('hide');
+}
+$('#report_form').popover({placement:'left',title:'Create Reports Easily',content:'Drag and drop of results and map elements allow you to create instant reports and share immediately. This option is not available for this demo.'});
+$('#analyze_menu').popover({placement:'bottom',title:'Analyze Your Results',content:'Analyze your results and identify trends over time. Use this function to create graphs and charts and add to reports. This option is not available for this demo.'});
+$('#tools_menu').popover({placement:'bottom',title:'Tools', content:'Use built-in tools to:<ul><li>Create custom map overlays</li><li>Add alerts and internal message system</li><li>Customize your dashboard</li>'});
+$('#report_menu').popover({placement:'bottom',title:'Reports',content:'Create Reports to share with organization. Create report templates for ease of reporting.'});
+$('#freq_words').popover({placement:'top',title:'Frequent Words',content:'This column will highlight the most frequently used words associated with the specified keyword'});
+$('#record_button').popover({placement:'bottom',title:'Record Data Streams',content:'Record streams of data from social networks using specified keywords. Recorded data can be analyzed to review trends over a given time period'});
+$('#location_form').popover({placement:'left',title:'Location',content:'The location will find all geo-coded tweets (regardless of specified keywords) from the given map coverage. Use the map controls to change the location, or enter an address,city,state to recenter map.'});
 $('#map_coordinates').focusout(function(){
 	updateMap();
 });
@@ -428,7 +442,10 @@ function geoToggle(){
 
 function search(){
 	
+	$('#keyword_input').popover('hide');
 	showResults();
+	if (first_load)
+	  $('#data_table').popover('show');
 	
 	if ($('#twitter_checkbox').attr('checked'))
 	  updateStream();

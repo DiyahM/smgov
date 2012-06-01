@@ -36,9 +36,9 @@
        <div class="nav-collapse">
 	     <ul class ="nav pull-right">
 	       <li><a href="#">MONITOR</a></li>
-	       <li><a href="#">ANALYZE</a></li>
-	       <li><a href="#">REPORT</a></li>
-	       <li><a href="#">TOOLS</a></li>
+	       <li id="analyze_menu"><a href="#">ANALYZE</a></li>
+	       <li id="report_menu"><a href="#">REPORT</a></li>
+	       <li id="tools_menu"><a href="#">TOOLS</a></li>
 	       <li><a href="#">LOGOUT</a></li>
 	     </ul>	
          
@@ -76,7 +76,7 @@
 				        <input type="checkbox" id="geo_checkbox" value="" onclick="geoToggle()" checked>Geocoded Tweets
 				      </label>
 				      <label class="checkbox inline">
-				        <input type="checkbox" id="twitter_sentiment_checkbox" value="" disabled>Images
+				        <input type="checkbox" id="images_checkbox" value="" disabled>Images
 				      </label>
 				      <label class="checkbox inline">
 				        <input type="checkbox" id="twitter_sentiment_checkbox" value="" disabled>Twitter Sentiment
@@ -85,10 +85,10 @@
 				        <input type="checkbox" id="police_checkbox" value="" disabled>Police Stations
 				      </label>
 				      <label class="checkbox inline">
-				        <input type="checkbox" id="fire_dept_checkbox" value="" disabled>Hospitals
+				        <input type="checkbox" id="hospital_checkbox" value="" disabled>Hospitals
 				      </label>
 				      <label class="checkbox inline">
-				        <input type="checkbox" id="hospital_checkbox" value="" disabled>{Custom Defined}
+				        <input type="checkbox" id="custom_checkbox" value="" disabled>{Custom Defined}
 				      </label>
 				      
 				      <button type="button" class="btn btn-mini disabled" style="margin-left:8px;"><i class="icon-map-marker"></i>Upload Map Overlays File</button> 
@@ -112,7 +112,7 @@
 	                   <th>Positive</th>
 	                   <th>Negative</th>
 	                   <th>Neutral</th>
-	                   <th>Frequently Associated Words</th>
+	                   <th id="freq_words">Frequently Associated Words</th>
 	                   <th></th>
 	                 </tr>
 	               </thead>
@@ -121,7 +121,7 @@
 	          </div>
 	           <!-- Results table END -->
 	           <!--TEMP for debug BEGIN-->
-	           <div id="tweets"><ul></ul></div>
+	           <div id="test"><ul></ul></div>
 	           <!--sample tweet that will go to 140 chars in 0 to 140. sample text, please help me. my throat is sore. still have 29 chars left at this now 4 1-->
 	          <!--TEMP for debug END-->
 	         </div>
@@ -129,7 +129,7 @@
         <!--COLUMN2 BEGIN for search, location, and spot report-->  
         <div class="span3 offset2">
           <!--Record button begin -->
-          <div class="row-fluid"><button class="btn disabled" style="width:95%;margin:10px;">Record Data Stream</button></div>
+          <div class="row-fluid"><button id="record_button" class="btn disabled" style="width:95%;margin:10px;">Record Data Stream</button></div>
            <!--Record button end -->
         <!--SEARCH BEGIN-->
            <div class="row-fluid">
@@ -168,7 +168,7 @@
 				<!--SEARCH END-->
 				      <!--MAP LAT LON BEGIN-->
 				  <div class="row-fluid">
-				     <form class="well">
+				     <form class="well" id="location_form">
 
 				        <fieldset>
 				     <h5> <i class="icon-map-marker"></i>LOCATION</h5>
@@ -202,7 +202,7 @@
 			================================================== --> 
            <div class="row-fluid">
 			
-			      <form class="well form-horizontal">
+			      <form class="well form-horizontal" id="report_form">
 
 			        <fieldset>
 			        
@@ -249,9 +249,12 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDSo3PnEx_f638NaT_VZKJJTqzBB-yhULg&sensor=false"></script>
 	<script src="/socket.io/socket.io.js"></script>
-    <script src="/js/app.js"></script>
+    <script src="/js/bootstrap-tooltip.js"></script>
+	<script src="/js/bootstrap-popover.js"></script>
     <script src="/js/bootstrap-scrollspy.js"></script>
     <script src="/js/bootstrap-collapse.js"></script>
+    <script src="/js/app.js"></script>
+   
     
     
 
